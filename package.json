@@ -1,0 +1,20 @@
+{
+  "name": "backbone-rest",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test": "NODE_ENV=test mocha test/suite.coffee --compilers coffee:coffee-script --reporter spec"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "express": "3.2.x",
+    "supertest": "0.7.0"
+  },
+  "dependencies": {
+    "coffee-script": "*",
+    "underscore": "1.4.x",
+    "backbone": "*",
+    "backbone-relational": "0.8.x",
+    "backbone": "1.0.x"
+  }
+}
