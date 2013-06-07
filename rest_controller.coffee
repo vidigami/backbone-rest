@@ -92,11 +92,13 @@
 
 #     next()
 
+_ = require 'underscore'
+
 module.exports = class RESTController
 
   constructor: (app, options={}) ->
     @[key] = value for key, value of options
-    @white_list or= {}
+    @white_lists or= {}
 
     app.get "/#{@route}", @index
     app.get "/#{@route}/:id", @show
@@ -110,7 +112,7 @@ module.exports = class RESTController
     try
       @model_type.cursor req.query, (err, cursor) =>
         return res.status(404).send(error: err.toString()) if err
-        cursor = cursor.select(@white_list.index) if @white_list.index
+        cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
         cursor.toJSON (err, json) ->
           if err then res.send(404) else res.json(json)
     catch err
@@ -120,7 +122,7 @@ module.exports = class RESTController
     try
       @model_type.cursor req.params, (err, cursor) =>
         return res.status(404).send(error: err.toString()) if err
-        cursor = cursor.select(@white_list.show) if @white_list.show
+        cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
         cursor.toJSON (err, json) ->
           return res.status(404).send(error: err.toString()) if err
           return res.status(404).send("Model not found with id: #{req.params.id}") unless json.length
@@ -135,7 +137,7 @@ module.exports = class RESTController
       model.save {}, {
         success: =>
           json = model.toJSON()
-          json = _.pick(json, @white_list.create) if @white_list.create
+          json = _.pick(json, @white_lists.create) if @white_lists.create
           res.json(json)
         error: -> res.send(404)
       }
@@ -150,7 +152,7 @@ module.exports = class RESTController
         model.save model.parse(req.body), {
           success: =>
             json = model.toJSON()
-            json = _.pick(json, @white_list.update) if @white_list.update
+            json = _.pick(json, @white_lists.update) if @white_lists.update
             res.json(json)
           error: -> res.send(404)
         }
