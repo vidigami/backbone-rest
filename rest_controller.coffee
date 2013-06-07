@@ -1,101 +1,8 @@
-  # # allow cross-origin
-  # app.all route, (req, res, next) ->
-  #   res.set('Access-Control-Allow-Origin', bind_options.origins)
-  #   res.set('Access-Control-Allow-Headers', 'X-Requested-With,CONTENT-TYPE')
-  #   res.set('Access-Control-Allow-Methods', 'GET,POST,PUT')
-  #   next()
-  # app.all "#{route}/:id", (req, res, next) ->
-  #   res.set('Access-Control-Allow-Origin', bind_options.origins)
-  #   res.set('Access-Control-Allow-Headers', 'X-Requested-With,CONTENT-TYPE')
-  #   res.set('Access-Control-Allow-Methods', 'GET,PUT,DELETE')
-  #   next()
-
-# module.exports = class RESTController
-
-#   parse_json: true
-#   route: ''
-#   cors:
-#     enabled: true
-#     origins: '*'
-
-#   @model_type: null
-
-#   constructor: (app) ->
-#     @_enableCors(app, url) for url in [@route, "#{@route}/:id"] if @cors.enabled
-#     @_bindDefaultRoutes(app)
-
-#   index: (req, res) =>
-#     query = req.params
-#     logger.info("Get index, query: #{query}")
-#     @model_type.find query, (err, photos) ->
-#       return res.json({ error: err }) if err
-#       res.json(photo.attributes for photo in photos)
-
-#   show: (req, res) =>
-#     id = req.params.id
-#     logger.info("Get id: #{id}")
-#     @model_type.findOne id, (err, photo) ->
-#       return res.json({ error: err }) if err
-#       return res.status(404).json() if not photo
-#       res.json(photo.attributes)
-
-#   create: (req, res) =>
-#     @model_type.create new @model_type(req.params), (err, photo) ->
-#       return res.json({ error: err }) if err
-#       return res.status(404).json() if not photo
-#       res.json(photo.attributes)
-
-#   update: (req, res) =>
-#     @model_type.update new @model_type(req.params), (err, photo) ->
-#       return res.json({ error: err }) if err
-#       return res.status(404).json() if not photo
-#       res.json(photo.attributes)
-
-#   delete: (req, res) =>
-#     id = req.params.id
-#     @model_type.delete new @model_type(req.params), (err, photo) ->
-#       return res.json({ error: err }) if err
-#       return res.status(404).json() if not photo
-#       res.json(photo.attributes)
-
-#   _enableCors: (app, url) =>
-#     app.all url, (req, res, next) ->
-#       res.set 'Access-Control-Allow-Origin', cors.origins if cors.origins
-#       res.header 'Access-Control-Allow-Headers', 'X-Requested-With,Content-Disposition,Content-Type,Content-Description,Content-Range'
-#       res.header 'Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE, OPTIONS'
-#       res.header('Access-Control-Allow-Credentials', 'true')
-#       next()
-
-#   _bindDefaultRoutes: (app) =>
-#     app.get "/#{@route}", @index
-#     app.get "/#{@route}/:id", @show
-#     app.post "/#{@route}", @create
-#     app.put "/#{@route}/:id", @update
-#     app.delete "/#{@route}/:id", @delete
-
-
-# _ = require 'underscore'
-# Query = require './query'
-
-# HTTP_ERRORS =
-#   INTERNAL_SERVER: 404
-
-# bindRoute = (app, url, bind_options={}) ->
-#   app.all url, (req, res, next) ->
-#     res.set 'Access-Control-Allow-Origin', bind_options.origins if bind_options.origins
-#     res.header 'Access-Control-Allow-Headers', 'X-Requested-With,Content-Disposition,Content-Type,Content-Description,Content-Range'
-#     res.header 'Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE, OPTIONS'
-#     res.header('Access-Control-Allow-Credentials', 'true')
-
-#     # TODO: why did options return 404 when switched to express 3.1.0 from 3.0.0rc1
-#     return res.send(200) if req.method.toLowerCase() is 'options'
-
-#     next()
-
 _ = require 'underscore'
 
 module.exports = class RESTController
 
+  # TODO: add raw_json vs going through parse and toJSON on the models
   constructor: (app, options={}) ->
     @[key] = value for key, value of options
     @white_lists or= {}
@@ -106,8 +13,6 @@ module.exports = class RESTController
     app.put "/#{@route}/:id", @update
     app.del "/#{@route}/:id", @destroy
 
-  # TODO: allow for external caller to set CORS
-  # TODO: sanitize query - white list
   index: (req, res) =>
     try
       @model_type.cursor req.query, (err, cursor) =>
@@ -170,3 +75,24 @@ module.exports = class RESTController
         }
     catch err
       res.status(500).send(error: err.toString())
+
+
+# TODO: allow for external caller to set CORS
+# # allow cross-origin
+# app.all route, (req, res, next) ->
+#   res.set('Access-Control-Allow-Origin', bind_options.origins)
+#   res.set('Access-Control-Allow-Headers', 'X-Requested-With,CONTENT-TYPE')
+#   res.set('Access-Control-Allow-Methods', 'GET,POST,PUT')
+#   next()
+# app.all "#{route}/:id", (req, res, next) ->
+#   res.set('Access-Control-Allow-Origin', bind_options.origins)
+#   res.set('Access-Control-Allow-Headers', 'X-Requested-With,CONTENT-TYPE')
+#   res.set('Access-Control-Allow-Methods', 'GET,PUT,DELETE')
+#   next()
+#   _enableCors: (app, url) =>
+#     app.all url, (req, res, next) ->
+#       res.set 'Access-Control-Allow-Origin', cors.origins if cors.origins
+#       res.header 'Access-Control-Allow-Headers', 'X-Requested-With,Content-Disposition,Content-Type,Content-Description,Content-Range'
+#       res.header 'Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE, OPTIONS'
+#       res.header('Access-Control-Allow-Credentials', 'true')
+#       next()
