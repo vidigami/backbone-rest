@@ -32,3 +32,4 @@ module.exports = class MockCursor
     else
       json = @json
     callback(null, json)
+    return @
