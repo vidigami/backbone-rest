@@ -4,78 +4,14 @@ request = require 'supertest'
 express = require 'express'
 _ = require 'underscore'
 
-Backbone = require 'backbone'
 RestController = require '../../rest_controller'
 
-class MockCursor
-  constructor: (@json, options={}) ->
-    @[key] = value for key, value of options
-
-  select: (keys) ->
-    keys = [keys] unless _.isArray(keys)
-    @$select = if @$select then _.intersection(@$select, keys) else keys
-    return @
-
-  values: (keys) ->
-    keys = [keys] unless _.isArray(keys)
-    @$values = if @$values then _.intersection(@$values, keys) else keys
-    return @
-
-  toJSON: (callback) ->
-    if @$values
-      json = []
-      for item in @json
-        result = []
-        result.push(item[key]) for key in @$values where item.hasOwnProperty(key)
-        json.push(result)
-    else if @$select
-      json = _.map(@json, (item) => _.pick(item, @$select))
-    else
-      json = @json
-    callback(null, json)
-
-ACTIVE_MODELS_JSON = []
-
-class MockServerModel extends Backbone.Model
-  @find: (query, callback) ->
-    @queries = MockServerModel._parseQueries(query)
-    json = _.find(ACTIVE_MODELS_JSON, (test) => test.id is @queries.find.id)
-    callback(null, if json then new MockServerModel(json) else null)
-
-  @cursor: (query, callback) ->
-    @queries = MockServerModel._parseQueries(query)
-    callback(null, new MockCursor(ACTIVE_MODELS_JSON, @queries.cursor))
-
-  save: (attributes={}, options={}) ->
-    @set(_.extend({id: _.uniqueId()}, attributes))
-    ACTIVE_MODELS_JSON.push(@toJSON())
-    options.success?(@)
-
-  destroy: (options={}) ->
-    id = @get('id')
-    for index, json of ACTIVE_MODELS_JSON
-      if json.id is id
-        delete ACTIVE_MODELS_JSON[index]
-        return options.success?(@)
-     options.error?(@)
-
-  @_parseQueries: (query) ->
-    unless _.isObject(query)
-      single_item = true
-      query = {id: query}
-
-    queries = {find: {}, cursor: {}}
-    for key, value of query
-      if key[0] is '$'
-        queries.cursor[key] = value
-      else
-        queries.find[key] = value
-    return queries
+MockServerModel = require '../mocks/server_model'
 
 describe 'RestController', ->
   beforeEach (done) ->
     counter = 0
-    ACTIVE_MODELS_JSON = [
+    MockServerModel.ACTIVE_MODELS_JSON = [
       {id: _.uniqueId('id'), name: _.uniqueId('name_'), created_at: (new Date).toISOString(), value1: counter++}
       {id: _.uniqueId('id'), name: _.uniqueId('name_'), created_at: (new Date).toISOString(), value1: counter++}
       {id: _.uniqueId('id'), name: _.uniqueId('name_'), created_at: (new Date).toISOString(), value1: counter++}
@@ -93,10 +29,10 @@ describe 'RestController', ->
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
           assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-          assert.deepEqual(ACTIVE_MODELS_JSON, res.body, 'models json returned')
+          assert.deepEqual(MockServerModel.ACTIVE_MODELS_JSON, res.body, 'models json returned')
           done()
 
-    it 'should select requested keys by single string', (done) ->
+    it 'should select requested keys by single key', (done) ->
       app = express(); app.use express.bodyParser()
       controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
 
@@ -107,7 +43,49 @@ describe 'RestController', ->
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
           assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-          assert.deepEqual(ACTIVE_MODELS_JSON, res.body, 'models json returned')
+          assert.deepEqual(_.map(MockServerModel.ACTIVE_MODELS_JSON, (item) -> _.pick(item, 'name')), res.body, 'models json returned')
+          done()
+
+    it 'should select requested keys by an array of keys', (done) ->
+      app = express(); app.use express.bodyParser()
+      controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
+
+      request(app)
+        .get('/mock_models')
+        .query({$select: ['name', 'created_at']})
+        .set('Accept', 'application/json')
+        .end (err, res) ->
+          assert.ok(!err, "no errors: #{err}")
+          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          assert.deepEqual(_.map(MockServerModel.ACTIVE_MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), res.body, 'models json returned')
+          done()
+
+    it 'should select requested values by single key', (done) ->
+      app = express(); app.use express.bodyParser()
+      controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
+
+      request(app)
+        .get('/mock_models')
+        .query({$values: 'name'})
+        .set('Accept', 'application/json')
+        .end (err, res) ->
+          assert.ok(!err, "no errors: #{err}")
+          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          assert.deepEqual(_.map(MockServerModel.ACTIVE_MODELS_JSON, (item) -> _.values(_.pick(item, 'name'))), res.body, 'models json returned')
+          done()
+
+    it 'should select requested values by an array of keys', (done) ->
+      app = express(); app.use express.bodyParser()
+      controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
+
+      request(app)
+        .get('/mock_models')
+        .query({$values: ['name', 'created_at']})
+        .set('Accept', 'application/json')
+        .end (err, res) ->
+          assert.ok(!err, "no errors: #{err}")
+          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          assert.deepEqual(_.map(MockServerModel.ACTIVE_MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at']))), res.body, 'models json returned')
           done()
 
   describe 'show', ->
@@ -116,12 +94,12 @@ describe 'RestController', ->
       controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
 
       request(app)
-        .get("/mock_models/#{ACTIVE_MODELS_JSON[0].id}")
+        .get("/mock_models/#{MockServerModel.ACTIVE_MODELS_JSON[0].id}")
         .set('Accept', 'application/json')
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
           assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-          assert.deepEqual(ACTIVE_MODELS_JSON[0], res.body, 'found the model')
+          assert.deepEqual(MockServerModel.ACTIVE_MODELS_JSON[0], res.body, 'found the model')
           done()
 
   describe 'create', ->
@@ -147,7 +125,7 @@ describe 'RestController', ->
       app.use express.bodyParser()
       controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
 
-      attributes = _.clone(ACTIVE_MODELS_JSON[1])
+      attributes = _.clone(MockServerModel.ACTIVE_MODELS_JSON[1])
       attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
       attributes.something = true
       request(app)
@@ -165,7 +143,7 @@ describe 'RestController', ->
       app.use express.bodyParser()
       controller = new RestController(app, {model_type: MockServerModel, route: 'mock_models'})
 
-      id = ACTIVE_MODELS_JSON[1].id
+      id = MockServerModel.ACTIVE_MODELS_JSON[1].id
       request(app)
         .del("/mock_models/#{id}")
         .end (err, res) ->

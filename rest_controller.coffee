@@ -108,7 +108,7 @@ module.exports = class RESTController
   # TODO: sanitize query - white list
   index: (req, res) =>
     try
-      @model_type.cursor req.params, (err, cursor) =>
+      @model_type.cursor req.query, (err, cursor) =>
         return res.status(404).send(error: err.toString()) if err
         cursor = cursor.select(@white_list.index) if @white_list.index
         cursor.toJSON (err, json) ->
