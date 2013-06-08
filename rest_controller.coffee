@@ -35,8 +35,7 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
-      model = new @model_type()
-      model.set(model.parse(req.body))
+      model = new @model_type(@model_type::parse(req.body))
       model.save {}, {
         success: =>
           json = model.toJSON()
