@@ -1,7 +1,7 @@
 testGenerator = require '../lib/test_generator'
 
 _ = require 'underscore'
-MockServerModel = require '../mocks/server_model'
+MockServerModel = require 'backbone-node/mocks/server_model'
 
 testGenerator {
   model_type: MockServerModel
