@@ -15,23 +15,21 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      @model_type.cursor req.query, (err, cursor) =>
-        return res.status(404).send(error: err.toString()) if err
-        cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
-        cursor.toJSON (err, json) ->
-          if err then res.send(404) else res.json(json)
+      cursor = @model_type.cursor(req.query)
+      cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
+      cursor.toJSON (err, json) ->
+        if err then res.send(404) else res.json(json)
     catch err
       res.status(500).send(error: err.toString())
 
   show: (req, res) =>
     try
-      @model_type.cursor req.params, (err, cursor) =>
+      cursor = @model_type.cursor(req.params)
+      cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
+      cursor.toJSON (err, json) ->
         return res.status(404).send(error: err.toString()) if err
-        cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
-        cursor.toJSON (err, json) ->
-          return res.status(404).send(error: err.toString()) if err
-          return res.status(404).send("Model not found with id: #{req.params.id}") unless json.length
-          res.json(json[0])
+        return res.status(404).send("Model not found with id: #{req.params.id}") unless json.length
+        res.json(json[0])
     catch err
       res.status(500).send(error: err.toString())
 
