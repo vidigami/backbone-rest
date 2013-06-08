@@ -1,12 +1,10 @@
+# each model should be fabricated with 'id', 'name', 'created_at', 'updated_at'
+# beforeEach should return the models_json for the current run
 module.exports = (options) ->
-
-  # each model should be fabricated with 'id', 'name', 'created_at', 'updated_at'
-  # beforeEach should return the models_json for the current run
-
   MODEL_TYPE = options.model_type
-  ROUTE = options.route
   BEFORE_EACH = options.beforeEach
   MODELS_JSON = null
+  ROUTE = options.route
 
   util = require 'util'
   assert = require 'assert'
