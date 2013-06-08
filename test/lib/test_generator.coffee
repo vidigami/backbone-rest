@@ -1,6 +1,6 @@
 module.exports = (options) ->
 
-  # each model should be fabricated with 'id', 'name', 'created_at', 'value1'
+  # each model should be fabricated with 'id', 'name', 'created_at', 'updated_at'
   # beforeEach should return the models_json for the current run
 
   MODEL_TYPE = options.model_type
@@ -72,7 +72,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -100,7 +100,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -114,7 +114,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -128,7 +128,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -226,7 +226,7 @@ module.exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -279,7 +279,7 @@ module.exports = (options) ->
         app = express(); app.use(express.bodyParser())
         controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
 
-        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), value1: Math.floor(Math.random()*10)}
+        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
         request(app)
           .post("/#{ROUTE}")
           .send(attributes)
@@ -292,9 +292,9 @@ module.exports = (options) ->
 
       it 'should create a new model and assign an id with whitelist', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {create: ['id', 'name', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {create: ['id', 'name', 'updated_at']}})
 
-        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), value1: Math.floor(Math.random()*10)}
+        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
         request(app)
           .post("/#{ROUTE}")
           .send(attributes)
@@ -303,7 +303,7 @@ module.exports = (options) ->
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
             assert.ok(!!res.body.id, 'assigned an id')
             assert.equal(attributes.name, res.body.name, 'name matches')
-            assert.equal(attributes.value1, res.body.value1, 'value1 matches')
+            assert.equal(attributes.updated_at, res.body.updated_at, 'updated_at matches')
             assert.ok(!res.body.created_at, 'created_at was not returned')
             done()
 
@@ -330,7 +330,7 @@ module.exports = (options) ->
 
       it 'should update an existing model with whitelist', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {update: ['id', 'name', 'value1']}})
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {update: ['id', 'name', 'updated_at']}})
 
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
@@ -341,7 +341,7 @@ module.exports = (options) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(_.pick(attributes, ['id', 'name', 'value1']), res.body, 'model was updated')
+            assert.deepEqual(_.pick(attributes, ['id', 'name', 'updated_at']), res.body, 'model was updated')
             done()
 
     ######################################
