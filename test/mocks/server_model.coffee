@@ -8,13 +8,12 @@ module.exports = class MockServerModel extends Backbone.Model
   @MODELS_JSON = []
 
   @find: (query, callback) ->
-    @queries = MockServerModel._parseQueries(query)
-    json = _.find(MockServerModel.MODELS_JSON, (test) => test.id is @queries.find.id)
+    id = if _.isObject(query) then query.id else query
+    json = _.find(MockServerModel.MODELS_JSON, (test) => test.id is id)
     callback(null, if json then new MockServerModel(json) else null)
 
   @cursor: (query) ->
-    @queries = MockServerModel._parseQueries(query)
-    return new MockCursor(MockServerModel.MODELS_JSON, @queries.cursor)
+    return new MockCursor(query, MockServerModel.MODELS_JSON)
 
   save: (attributes={}, options={}) ->
     @set(_.extend({id: _.uniqueId()}, attributes))
@@ -28,19 +27,3 @@ module.exports = class MockServerModel extends Backbone.Model
         delete MockServerModel.MODELS_JSON[index]
         return options.success?(@)
      options.error?(@)
-
-  @_parseQueries: (query) ->
-    unless _.isObject(query)
-      single_item = true
-      query = {id: query}
-
-    queries = {find: {}, cursor: {}}
-    for key, value of query
-      if key[0] is '$'
-        if key is '$select' or key is '$values'
-          queries.cursor[key] = if _.isArray(value) then value else [value]
-        else
-          queries.cursor[key] = value
-      else
-        queries.find[key] = value
-    return queries

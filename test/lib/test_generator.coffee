@@ -325,7 +325,7 @@ module.exports = (options) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(attributes, res.body, 'model was updated')
+            assert.deepEqual(_.omit(attributes, '_rev'), _.omit(res.body, '_rev'), 'model was updated') # there could be _rev added
             done()
 
       it 'should update an existing model with whitelist', (done) ->
