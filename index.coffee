@@ -1,1 +1,1 @@
-module.exports = require 'rest_controller'
+module.exports = require './rest_controller'
