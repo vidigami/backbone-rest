@@ -12,9 +12,9 @@ module.exports = class MockServerModel extends Backbone.Model
     json = _.find(MockServerModel.MODELS_JSON, (test) => test.id is @queries.find.id)
     callback(null, if json then new MockServerModel(json) else null)
 
-  @cursor: (query, callback) ->
+  @cursor: (query) ->
     @queries = MockServerModel._parseQueries(query)
-    callback(null, new MockCursor(MockServerModel.MODELS_JSON, @queries.cursor))
+    return new MockCursor(MockServerModel.MODELS_JSON, @queries.cursor)
 
   save: (attributes={}, options={}) ->
     @set(_.extend({id: _.uniqueId()}, attributes))
