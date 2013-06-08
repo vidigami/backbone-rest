@@ -35,7 +35,8 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
-      model = new @model_type(@model_type::parse(req.body))
+      json = if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body
+      model = new @model_type(@model_type::parse(json))
       model.save {}, {
         success: =>
           json = model.toJSON()
@@ -48,14 +49,15 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
+      json = if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body
       @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless model
-        model.save model.parse(req.body), {
-          success: =>
-            json = model.toJSON()
-            json = _.pick(json, @white_lists.update) if @white_lists.update
-            res.json(json)
+        model.save model.parse(json), {
+        success: =>
+          json = model.toJSON()
+          json = _.pick(json, @white_lists.update) if @white_lists.update
+          res.json(json)
           error: -> res.send(404)
         }
     catch err
