@@ -24,7 +24,7 @@ module.exports = class RESTController
 
   show: (req, res) =>
     try
-      cursor = @model_type.cursor(req.params)
+      cursor = @model_type.cursor(req.params.id)
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
       cursor.toJSON (err, json) ->
         return res.status(404).send(error: err.toString()) if err
@@ -48,7 +48,7 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
-      @model_type.find req.params, (err, model) =>
+      @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless model
         model.save model.parse(req.body), {
@@ -63,7 +63,7 @@ module.exports = class RESTController
 
   destroy: (req, res) =>
     try
-      @model_type.find req.params, (err, model) =>
+      @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless model
         model.destroy {
