@@ -248,7 +248,7 @@ module.exports = (options) ->
         controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
 
         request(app)
-          .get("/mock_models/#{MODELS_JSON[0].id}")
+          .get("/#{ROUTE}/#{MODELS_JSON[0].id}")
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -262,7 +262,7 @@ module.exports = (options) ->
 
         attributes = _.clone(MODELS_JSON[0])
         request(app)
-          .get("/mock_models/#{attributes.id}")
+          .get("/#{ROUTE}/#{attributes.id}")
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -320,7 +320,7 @@ module.exports = (options) ->
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
         attributes.something = true
         request(app)
-          .put("/mock_models/#{attributes.id}")
+          .put("/#{ROUTE}/#{attributes.id}")
           .send(attributes)
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -336,7 +336,7 @@ module.exports = (options) ->
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
         attributes.something = true
         request(app)
-          .put("/mock_models/#{attributes.id}")
+          .put("/#{ROUTE}/#{attributes.id}")
           .send(attributes)
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -355,7 +355,7 @@ module.exports = (options) ->
 
         id = MODELS_JSON[1].id
         request(app)
-          .del("/mock_models/#{id}")
+          .del("/#{ROUTE}/#{id}")
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
