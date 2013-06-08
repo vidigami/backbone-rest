@@ -318,7 +318,6 @@ module.exports = (options) ->
 
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
-        attributes.something = true
         request(app)
           .put("/#{ROUTE}/#{attributes.id}")
           .send(attributes)
@@ -334,7 +333,6 @@ module.exports = (options) ->
 
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
-        attributes.something = true
         request(app)
           .put("/#{ROUTE}/#{attributes.id}")
           .send(attributes)

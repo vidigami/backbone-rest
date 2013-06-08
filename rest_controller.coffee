@@ -26,9 +26,10 @@ module.exports = class RESTController
     try
       cursor = @model_type.cursor(req.params.id)
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
-      cursor.toJSON (err, json) ->
+      cursor.toJSON (err, json) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless json
+        json = _.pick(json, @white_lists.show) if @white_lists.show
         res.json(json)
     catch err
       res.status(500).send(error: err.toString())
@@ -54,10 +55,10 @@ module.exports = class RESTController
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless model
         model.save model.parse(json), {
-        success: =>
-          json = model.toJSON()
-          json = _.pick(json, @white_lists.update) if @white_lists.update
-          res.json(json)
+          success: =>
+            json = model.toJSON()
+            json = _.pick(json, @white_lists.update) if @white_lists.update
+            res.json(json)
           error: -> res.send(404)
         }
     catch err
