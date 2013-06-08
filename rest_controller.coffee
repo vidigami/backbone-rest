@@ -28,8 +28,8 @@ module.exports = class RESTController
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
       cursor.toJSON (err, json) ->
         return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send("Model not found with id: #{req.params.id}") unless json.length
-        res.json(json[0])
+        return res.status(404).send("Model not found with id: #{req.params.id}") unless json
+        res.json(json)
     catch err
       res.status(500).send(error: err.toString())
 
