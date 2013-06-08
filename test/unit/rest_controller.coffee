@@ -1,4 +1,4 @@
-testGenerator = require '../lib/test_generator'
+testGenerator = require '../../lib/test_generators/backbone_rest'
 
 _ = require 'underscore'
 MockServerModel = require 'backbone-node/mocks/server_model'
