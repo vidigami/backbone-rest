@@ -17,6 +17,7 @@
     "backbone": "*",
     "backbone-relational": "0.8.x",
     "backbone": "1.0.x",
-    "backbone-node": "git+https://dvidi:U5RqFaNC@bitbucket.org/vidigami/backbone-node"
+    "backbone-node": "git+https://dvidi:U5RqFaNC@bitbucket.org/vidigami/backbone-node",
+    "queue-async": "1.0.x"
   }
 }
