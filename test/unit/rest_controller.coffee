@@ -1,6 +1,7 @@
 _ = require 'underscore'
 Queue = require 'queue-async'
 
+JSONUtils = require 'backbone-node/json_utils'
 Fabricator = require 'backbone-node/fabricator'
 MockServerModel = require 'backbone-node/mocks/server_model'
 
@@ -8,9 +9,7 @@ test_parameters =
   model_type: MockServerModel
   route: 'mock_models'
   beforeEach: (callback) ->
-    queue = new Queue(1)
-    queue.defer (callback) -> MockServerModel.destroy {}, callback
-    queue.defer (callback) -> Fabricator.create(MockServerModel, 10, {id: Fabricator.uniqueId('id_'), name: Fabricator.uniqueId('album_'), created_at: Fabricator.dateString, updated_at: Fabricator.dateString}, callback)
-    queue.await (err) -> callback(null, _.map(MockServerModel.MODELS = _.toArray(arguments).pop(), (test) -> test.attributes))
+    MockServerModel.MODELS = Fabricator.new(MockServerModel, 10, {id: Fabricator.uniqueId('id_'), name: Fabricator.uniqueId('name_'), created_at: Fabricator.date, updated_at: Fabricator.date})
+    callback(null, _.map(MockServerModel.MODELS, (model) -> JSONUtils.valueToJSON(model.toJSON())))
 
 require('../../lib/test_generators/backbone_rest')(test_parameters)
