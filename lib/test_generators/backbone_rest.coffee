@@ -152,7 +152,7 @@ module.exports = (options) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> item['name']), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by single key (in array)', (done) ->
