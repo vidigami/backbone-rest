@@ -36,11 +36,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
+          .query({$sort: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = MODELS_JSON, actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = MODELS_JSON, actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by single key', (done) ->
@@ -49,12 +50,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: 'name'})
+          .query({$sort: 'name', $select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by single key respecting whitelist (key included)', (done) ->
@@ -63,12 +64,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: 'name'})
+          .query({$sort: 'name',  $select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
@@ -77,12 +78,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: 'name'})
+          .query({$sort: 'name',  $select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> []), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> []), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys', (done) ->
@@ -91,12 +92,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: ['name', 'created_at']})
+          .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
@@ -105,12 +106,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: ['name', 'created_at']})
+          .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
@@ -119,7 +120,7 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: ['name', 'created_at']})
+          .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -133,12 +134,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$select: ['name', 'created_at']})
+          .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> {}), actual = sortO(res.body, 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> {}), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by single key', (done) ->
@@ -147,12 +148,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: 'name'})
+          .query({$sort: 'name',  $values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by single key (in array)', (done) ->
@@ -161,12 +162,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: ['name']})
+          .query({$sort: 'name',  $values: ['name']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by single key respecting whitelist (key included)', (done) ->
@@ -175,12 +176,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: 'name'})
+          .query({$sort: 'name',  $values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by single key respecting whitelist (key excluded)', (done) ->
@@ -189,12 +190,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: 'name'})
+          .query({$sort: 'name',  $values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> null)), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> null)), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by an array of keys', (done) ->
@@ -203,12 +204,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: ['name', 'created_at']})
+          .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
@@ -217,12 +218,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: ['name', 'created_at']})
+          .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
@@ -231,12 +232,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: ['name', 'created_at']})
+          .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name'])))), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name'])))), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
@@ -245,12 +246,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$values: ['name', 'created_at']})
+          .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> [])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> [])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
     ######################################
