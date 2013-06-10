@@ -373,4 +373,10 @@ module.exports = (options) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            done()
+
+            request(app)
+              .get("/#{ROUTE}/#{id}")
+              .end(err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 404, "status 404 on subsequent request. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                done()
