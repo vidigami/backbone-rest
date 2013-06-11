@@ -13,3 +13,4 @@ test_parameters =
     callback(null, _.map(MockServerModel.MODELS, (model) -> JSONUtils.valueToJSON(model.toJSON())))
 
 require('../../lib/test_generators/backbone_rest')(test_parameters)
+require('../../lib/test_generators/backbone_rest_sorted')(test_parameters)
