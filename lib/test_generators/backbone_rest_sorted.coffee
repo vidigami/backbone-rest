@@ -120,12 +120,12 @@ module.exports = (options) ->
 
         request(app)
           .get("/#{ROUTE}")
-          .query({$sort: 'name',  $select: ['name', 'created_at']})
+          .query({$sort: 'created_at',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortO(_.map(MODELS_JSON, (item) -> _.pick(item, ['created_at'])), 'created_at'), actual = sortO(res.body, 'created_at'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortO(_.map(MODELS_JSON, (item) -> _.pick(item, ['created_at'])), 'created_at'), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
