@@ -1,5 +1,6 @@
 util = require 'util'
 _ = require 'underscore'
+Utils = require 'backbone-node/utils'
 
 module.exports = class RESTController
 
@@ -16,7 +17,7 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      cursor = @model_type.cursor(req.query)
+      cursor = @model_type.cursor(Utils.parse(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) ->
         if err then res.send(404) else res.json(json)
