@@ -12,6 +12,7 @@ module.exports = (options) ->
   express = require 'express'
   _ = require 'underscore'
 
+  Utils = require 'backbone-node/utils'
   RestController = require '../../rest_controller'
 
   describe 'RestController', ->
@@ -126,3 +127,23 @@ module.exports = (options) ->
             assert.ok(_.isArray(json), 'cursor item values is an array')
             assert.equal(json.length, FIELD_NAMES.length, 'gets only the requested values')
           done()
+
+    it 'Ensure the correct value is returned', (done) ->
+      Utils.getAt MODEL_TYPE, 2, (err, model) ->
+        assert.ok(!err, 'no errors')
+        assert.ok(!!model, 'model')
+
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+
+        request(app)
+          .get("/#{ROUTE}")
+          .query({$page: true, name: model.get('name')})
+          .set('Accept', 'application/json')
+          .end (err, res) ->
+            assert.ok(!err, 'no errors')
+            assert.ok(!!data = res.body, 'got data')
+            assert.equal(data.total_rows, 1, 'has the correct total_rows')
+            assert.equal(data.rows.length, 1, 'has the correct row.length')
+            assert.deepEqual(expected = JSON.stringify(model.toJSON()), actual = JSON.stringify(data.rows[0]), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            done()
