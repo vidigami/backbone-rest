@@ -1,1 +1,1 @@
-require './unit/rest_controller'
+require './unit/all_generators'
