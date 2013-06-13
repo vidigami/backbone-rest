@@ -12,7 +12,7 @@ test_parameters =
   route: 'mock_models'
   beforeEach: (callback) ->
     queue = new Queue(1)
-    queue.defer (callback) -> MemoryModel.destroy {}, callback
+    queue.defer (callback) -> MemoryModel.destroy callback
     queue.defer (callback) -> Fabricator.create(MemoryModel, 10, {
       name: Fabricator.uniqueId('album_')
       created_at: Fabricator.date
