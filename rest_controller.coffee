@@ -1,6 +1,6 @@
 util = require 'util'
 _ = require 'underscore'
-Utils = require 'backbone-node/utils'
+Utils = require 'backbone-orm/utils'
 
 module.exports = class RESTController
 

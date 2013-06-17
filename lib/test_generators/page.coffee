@@ -12,7 +12,7 @@ module.exports = (options) ->
   express = require 'express'
   _ = require 'underscore'
 
-  Utils = require 'backbone-node/utils'
+  Utils = require 'backbone-orm/utils'
   RestController = require '../../rest_controller'
 
   describe 'RestController', ->

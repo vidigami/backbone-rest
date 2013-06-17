@@ -2,11 +2,11 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 Queue = require 'queue-async'
 
-JSONUtils = require 'backbone-node/lib/json_utils'
+JSONUtils = require 'backbone-orm/lib/json_utils'
 class MemoryModel extends Backbone.Model
   url: '/memory_models'
-  sync: require('backbone-node/memory_backbone_sync')(MemoryModel)
-Fabricator = require 'backbone-node/fabricator'
+  sync: require('backbone-orm/memory_backbone_sync')(MemoryModel)
+Fabricator = require 'backbone-orm/fabricator'
 
 test_parameters =
   model_type: MemoryModel
