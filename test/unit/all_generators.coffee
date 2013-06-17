@@ -4,6 +4,7 @@ Queue = require 'queue-async'
 
 JSONUtils = require 'backbone-node/lib/json_utils'
 class MemoryModel extends Backbone.Model
+  url: '/memory_models'
   sync: require('backbone-node/memory_backbone_sync')(MemoryModel)
 Fabricator = require 'backbone-node/fabricator'
 
