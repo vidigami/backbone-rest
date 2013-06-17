@@ -34,7 +34,7 @@ module.exports = (options) ->
         .query({$page: true, $limit: LIMIT})
         .set('Accept', 'application/json')
         .end (err, res) ->
-          assert.ok(!err, 'no errors')
+          assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
           assert.ok(data.rows, 'received models')
           assert.equal(data.total_rows, MODELS_JSON.length, 'has the correct total_rows')
@@ -51,7 +51,7 @@ module.exports = (options) ->
         .get("/#{ROUTE}?$page&$limit=#{LIMIT}")
         .set('Accept', 'application/json')
         .end (err, res) ->
-          assert.ok(!err, 'no errors')
+          assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
           assert.ok(data.rows, 'received models')
           assert.equal(data.total_rows, MODELS_JSON.length, 'has the correct total_rows')
@@ -69,7 +69,7 @@ module.exports = (options) ->
         .query({$page: false, $limit: LIMIT})
         .set('Accept', 'application/json')
         .end (err, res) ->
-          assert.ok(!err, 'no errors')
+          assert.ok(!err, "No errors: #{err}")
           assert.ok(!!(data = res.body), 'got data')
           assert.equal(LIMIT, data.length, "Expected: #{LIMIT}, Actual: #{data.length}")
           done()
@@ -85,7 +85,7 @@ module.exports = (options) ->
         .query({$page: true, $limit: LIMIT, $offset: OFFSET})
         .set('Accept', 'application/json')
         .end (err, res) ->
-          assert.ok(!err, 'no errors')
+          assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
           assert.equal(data.total_rows, MODELS_JSON.length, 'has the correct total_rows')
           assert.equal(OFFSET, data.offset, 'has the correct offset')
@@ -103,7 +103,7 @@ module.exports = (options) ->
         .query({$page: true, $select: FIELD_NAMES})
         .set('Accept', 'application/json')
         .end (err, res) ->
-          assert.ok(!err, 'no errors')
+          assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
           for json in data.rows
             assert.equal(_.size(json), FIELD_NAMES.length, 'gets only the requested values')
@@ -120,7 +120,7 @@ module.exports = (options) ->
         .query({$page: true, $values: FIELD_NAMES})
         .set('Accept', 'application/json')
         .end (err, res) ->
-          assert.ok(!err, 'no errors')
+          assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
           assert.ok(_.isArray(data.rows), 'cursor values is an array')
           for json in data.rows
@@ -130,7 +130,7 @@ module.exports = (options) ->
 
     it 'Ensure the correct value is returned', (done) ->
       MODEL_TYPE.find {$one: true}, (err, model) ->
-        assert.ok(!err, 'no errors')
+        assert.ok(!err, "No errors: #{err}")
         assert.ok(!!model, 'model')
 
         app = express(); app.use(express.bodyParser())
@@ -141,7 +141,7 @@ module.exports = (options) ->
           .query({$page: true, name: model.get('name')})
           .set('Accept', 'application/json')
           .end (err, res) ->
-            assert.ok(!err, 'no errors')
+            assert.ok(!err, "No errors: #{err}")
             assert.ok(!!data = res.body, 'got data')
             assert.equal(data.total_rows, 1, 'has the correct total_rows')
             assert.equal(data.rows.length, 1, 'has the correct row.length')
