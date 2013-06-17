@@ -14,8 +14,6 @@
   "dependencies": {
     "coffee-script": "*",
     "underscore": "1.4.x",
-    "backbone": "*",
-    "backbone-relational": "0.8.x",
     "backbone": "1.0.x",
     "backbone-orm": "git+https://dvidi:U5RqFaNC@bitbucket.org/vidigami/backbone-orm",
     "queue-async": "1.0.x"
