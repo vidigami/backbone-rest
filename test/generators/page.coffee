@@ -1,33 +1,57 @@
-# each model should be fabricated with 'id', 'name', 'created_at', 'updated_at'
-# beforeEach should return the models_json for the current run
-module.exports = (options) ->
-  MODEL_TYPE = options.model_type
-  BEFORE_EACH = options.beforeEach
+util = require 'util'
+assert = require 'assert'
+_ = require 'underscore'
+Backbone = require 'backbone'
+Queue = require 'queue-async'
+
+Fabricator = require 'backbone-orm/fabricator'
+Utils = require 'backbone-orm/utils'
+adapters = Utils.adapters
+
+request = require 'supertest'
+express = require 'express'
+
+RestController = require '../../rest_controller'
+
+sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
+sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
+
+runTests = (options, cache, embed) ->
+  DATABASE_URL = options.database_url or ''
+  BASE_SCHEMA = options.schema or {}
+  SYNC = options.sync
+  BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = options.route
 
-  util = require 'util'
-  assert = require 'assert'
-  request = require 'supertest'
-  express = require 'express'
-  _ = require 'underscore'
+  class Flat extends Backbone.Model
+    url: "#{DATABASE_URL}/flats"
+    sync: SYNC(Flat, cache)
 
-  Utils = require 'backbone-orm/utils'
-  RestController = require '../../rest_controller'
+  describe "RestController (page: true, cache: #{cache} embed: #{embed})", ->
 
-  describe 'RestController', ->
     beforeEach (done) ->
-      BEFORE_EACH (err, models_json) ->
-        return done(err) if err
-        return done(new Error "Missing models json for initialization") unless models_json
-        MODELS_JSON = models_json
-        done()
+      queue = new Queue(1)
+
+      queue.defer (callback) -> Flat.destroy callback
+
+      queue.defer (callback) -> Fabricator.create(Flat, BASE_COUNT, {
+        name: Fabricator.uniqueId('flat_')
+        created_at: Fabricator.date
+        updated_at: Fabricator.date
+      }, (err, models) ->
+        return callback(err) if err
+        MODELS_JSON = sortO(_.map(models, (test) -> test.toJSON()), 'name') # need to sort because not sure what order will come back from database
+        callback()
+      )
+
+      queue.await done
 
     it 'Cursor can chain limit with paging', (done) ->
       LIMIT = 3
 
       app = express(); app.use(express.bodyParser())
-      controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+      controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
         .get("/#{ROUTE}")
@@ -45,7 +69,7 @@ module.exports = (options) ->
       LIMIT = 3
 
       app = express(); app.use(express.bodyParser())
-      controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+      controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
         .get("/#{ROUTE}?$page&$limit=#{LIMIT}")
@@ -62,7 +86,7 @@ module.exports = (options) ->
       LIMIT = 3
 
       app = express(); app.use(express.bodyParser())
-      controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+      controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
         .get("/#{ROUTE}")
@@ -78,7 +102,7 @@ module.exports = (options) ->
       LIMIT = 2; OFFSET = 1
 
       app = express(); app.use(express.bodyParser())
-      controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+      controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
         .get("/#{ROUTE}")
@@ -96,7 +120,7 @@ module.exports = (options) ->
       FIELD_NAMES = ['id', 'name']
 
       app = express(); app.use(express.bodyParser())
-      controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+      controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
         .get("/#{ROUTE}")
@@ -113,7 +137,7 @@ module.exports = (options) ->
       FIELD_NAMES = ['id', 'name']
 
       app = express(); app.use(express.bodyParser())
-      controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+      controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
         .get("/#{ROUTE}")
@@ -129,12 +153,12 @@ module.exports = (options) ->
           done()
 
     it 'Ensure the correct value is returned', (done) ->
-      MODEL_TYPE.find {$one: true}, (err, model) ->
+      Flat.find {$one: true}, (err, model) ->
         assert.ok(!err, "No errors: #{err}")
         assert.ok(!!model, 'model')
 
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -147,3 +171,13 @@ module.exports = (options) ->
             assert.equal(data.rows.length, 1, 'has the correct row.length')
             assert.deepEqual(expected = JSON.stringify(model.toJSON()), actual = JSON.stringify(data.rows[0]), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
+
+# TODO: explain required set up
+
+# each model should have available attribute 'id', 'name', 'created_at', 'updated_at', etc....
+# beforeEach should return the models_json for the current run
+module.exports = (options) ->
+  runTests(options, false, false)
+  runTests(options, true, false)
+  # runTests(options, false, true) if options.embed # TODO
+  # runTests(options, true, true) if options.embed # TODO

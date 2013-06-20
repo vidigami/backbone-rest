@@ -1,29 +1,51 @@
-# each model should be fabricated with 'id', 'name', 'created_at', 'updated_at'
-# beforeEach should return the models_json for the current run
-module.exports = (options) ->
-  MODEL_TYPE = options.model_type
-  BEFORE_EACH = options.beforeEach
+util = require 'util'
+assert = require 'assert'
+_ = require 'underscore'
+Backbone = require 'backbone'
+Queue = require 'queue-async'
+
+Fabricator = require 'backbone-orm/fabricator'
+Utils = require 'backbone-orm/utils'
+adapters = Utils.adapters
+
+request = require 'supertest'
+express = require 'express'
+
+RestController = require '../../rest_controller'
+
+sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
+sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
+
+runTests = (options, cache, embed) ->
+  DATABASE_URL = options.database_url or ''
+  BASE_SCHEMA = options.schema or {}
+  SYNC = options.sync
+  BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = options.route
 
-  util = require 'util'
-  assert = require 'assert'
-  request = require 'supertest'
-  express = require 'express'
-  _ = require 'underscore'
+  class Flat extends Backbone.Model
+    url: "#{DATABASE_URL}/flats"
+    sync: SYNC(Flat, cache)
 
-  RestController = require '../../rest_controller'
+  describe "RestController (sorted: false, cache: #{cache} embed: #{embed})", ->
 
-  sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
-  sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
-
-  describe 'RestController', ->
     beforeEach (done) ->
-      BEFORE_EACH (err, models_json) ->
-        return done(err) if err
-        return done(new Error "Missing models json for initialization") unless models_json
-        MODELS_JSON = sortO(models_json, 'name') # need to sort because not sure what order will come back from database
-        done()
+      queue = new Queue(1)
+
+      queue.defer (callback) -> Flat.destroy callback
+
+      queue.defer (callback) -> Fabricator.create(Flat, BASE_COUNT, {
+        name: Fabricator.uniqueId('flat_')
+        created_at: Fabricator.date
+        updated_at: Fabricator.date
+      }, (err, models) ->
+        return callback(err) if err
+        MODELS_JSON = sortO(_.map(models, (test) -> test.toJSON()), 'name') # need to sort because not sure what order will come back from database
+        callback()
+      )
+
+      queue.await done
 
     ######################################
     # index
@@ -32,7 +54,7 @@ module.exports = (options) ->
     describe 'index', ->
       it 'should return json for all models with no query', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -45,7 +67,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by single key', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -59,7 +81,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by single key respecting whitelist (key included)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -73,7 +95,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -87,7 +109,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -101,7 +123,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -115,7 +137,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -129,7 +151,7 @@ module.exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -143,7 +165,7 @@ module.exports = (options) ->
 
       it 'should select requested values by single key', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -157,7 +179,7 @@ module.exports = (options) ->
 
       it 'should select requested values by single key (in array)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -171,7 +193,7 @@ module.exports = (options) ->
 
       it 'should select requested values by single key respecting whitelist (key included)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -185,7 +207,7 @@ module.exports = (options) ->
 
       it 'should select requested values by single key respecting whitelist (key excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -199,7 +221,7 @@ module.exports = (options) ->
 
       it 'should select requested values by an array of keys', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}")
@@ -213,7 +235,7 @@ module.exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -227,7 +249,7 @@ module.exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'name']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -241,7 +263,7 @@ module.exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
           .get("/#{ROUTE}")
@@ -260,7 +282,7 @@ module.exports = (options) ->
     describe 'show', ->
       it 'should find an existing model', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
           .get("/#{ROUTE}/#{MODELS_JSON[0].id}")
@@ -273,7 +295,7 @@ module.exports = (options) ->
 
       it 'should find an existing model with whitelist', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {show: ['id', 'name', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {show: ['id', 'name', 'created_at']}})
 
         attributes = _.clone(MODELS_JSON[0])
         request(app)
@@ -292,7 +314,7 @@ module.exports = (options) ->
     describe 'create', ->
       it 'should create a new model and assign an id', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
         request(app)
@@ -307,7 +329,7 @@ module.exports = (options) ->
 
       it 'should create a new model and assign an id with whitelist', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {create: ['id', 'name', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {create: ['id', 'name', 'updated_at']}})
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
         request(app)
@@ -329,7 +351,7 @@ module.exports = (options) ->
     describe 'update', ->
       it 'should update an existing model', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
@@ -344,7 +366,7 @@ module.exports = (options) ->
 
       it 'should update an existing model with whitelist', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE, white_lists: {update: ['id', 'name', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {update: ['id', 'name', 'updated_at']}})
 
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
@@ -364,7 +386,7 @@ module.exports = (options) ->
     describe 'delete', ->
       it 'should delete an existing model', (done) ->
         app = express(); app.use(express.bodyParser())
-        controller = new RestController(app, {model_type: MODEL_TYPE, route: ROUTE})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         id = MODELS_JSON[1].id
         request(app)
@@ -379,3 +401,13 @@ module.exports = (options) ->
                 assert.ok(!err, "no errors: #{err}")
                 assert.equal(res.status, 404, "status 404 on subsequent request. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                 done()
+
+# TODO: explain required set up
+
+# each model should have available attribute 'id', 'name', 'created_at', 'updated_at', etc....
+# beforeEach should return the models_json for the current run
+module.exports = (options) ->
+  runTests(options, false, false)
+  runTests(options, true, false)
+  # runTests(options, false, true) if options.embed # TODO
+  # runTests(options, true, true) if options.embed # TODO

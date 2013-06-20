@@ -1,24 +1,7 @@
-_ = require 'underscore'
-Backbone = require 'backbone'
-Queue = require 'queue-async'
-
-JSONUtils = require 'backbone-orm/lib/json_utils'
-class MemoryModel extends Backbone.Model
-  url: '/memory_models'
-  sync: require('backbone-orm/memory_backbone_sync')(MemoryModel)
-Fabricator = require 'backbone-orm/fabricator'
-
 test_parameters =
-  model_type: MemoryModel
-  route: 'mock_models'
-  beforeEach: (callback) ->
-    queue = new Queue(1)
-    queue.defer (callback) -> MemoryModel.destroy callback
-    queue.defer (callback) -> Fabricator.create(MemoryModel, 10, {
-      name: Fabricator.uniqueId('album_')
-      created_at: Fabricator.date
-      updated_at: Fabricator.date
-    }, callback)
-    queue.await (err) -> callback(null, _.map(_.toArray(arguments).pop(), (test) -> JSONUtils.valueToJSON(test.toJSON())))
+  database_url: ''
+  schema: {}
+  sync: require('backbone-orm/memory_backbone_sync')
+  embed: true
 
-require('../../lib/test_generators/all')(test_parameters)
+require('../generators/all')(test_parameters)
