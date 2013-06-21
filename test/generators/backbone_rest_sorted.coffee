@@ -22,7 +22,7 @@ runTests = (options, cache, embed) ->
   SYNC = options.sync
   BASE_COUNT = 5
   MODELS_JSON = null
-  ROUTE = options.route
+  ROUTE = "#{DATABASE_URL}/flats"
 
   class Flat extends Backbone.Model
     url: "#{DATABASE_URL}/flats"
@@ -57,7 +57,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -71,7 +71,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name', $select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -85,7 +85,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -99,7 +99,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -113,7 +113,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -127,7 +127,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -141,7 +141,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'created_at',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -155,7 +155,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -169,7 +169,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -183,7 +183,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: ['name']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -197,7 +197,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -211,7 +211,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -225,7 +225,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -239,7 +239,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -253,7 +253,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -267,7 +267,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
