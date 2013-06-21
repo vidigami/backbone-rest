@@ -71,8 +71,6 @@ module.exports = class RESTController
 
   destroy: (req, res) =>
     try
-      console.log "destroy: #{util.inspect(req.query)}"
-
       # TODO: is there a way to do this without the model? eg. transaction only (with confirmation of existence) - HEAD?
       if req.params.id
         @model_type.find req.params.id, (err, model) =>
@@ -88,8 +86,6 @@ module.exports = class RESTController
   destroyByQuery: (req, res) =>
     try
       @model_type.destroy Utils.parseRawQuery(req.query), (err) =>
-        console.log "destroyByQuery: #{util.inspect(req.query)}"
-
         return res.status(500).send(error: err.toString()) if err
         res.send(200)
     catch err
