@@ -22,7 +22,7 @@ runTests = (options, cache, embed) ->
   SYNC = options.sync
   BASE_COUNT = 5
   MODELS_JSON = null
-  ROUTE = "#{DATABASE_URL}/flats"
+  ROUTE = "/test/flats"
 
   class Flat extends Backbone.Model
     url: "#{DATABASE_URL}/flats"
