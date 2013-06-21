@@ -9,11 +9,14 @@ module.exports = class RESTController
     @[key] = value for key, value of options
     @white_lists or= {}
 
-    app.get @route, @index
     app.get "#{@route}/:id", @show
+    app.get @route, @index
+
     app.post @route, @create
     app.put "#{@route}/:id", @update
+
     app.del "#{@route}/:id", @destroy
+    app.del @route, @destroyByQuery
 
   index: (req, res) =>
     try
@@ -68,6 +71,8 @@ module.exports = class RESTController
 
   destroy: (req, res) =>
     try
+      console.log "destroy: #{util.inspect(req.query)}"
+
       # TODO: is there a way to do this without the model? eg. transaction only (with confirmation of existence) - HEAD?
       if req.params.id
         @model_type.find req.params.id, (err, model) =>
@@ -77,11 +82,16 @@ module.exports = class RESTController
             success: -> res.send(200)
             error: -> res.send(404)
           }
-      # query destroy
-      else
-        @model_type.destroy req.params, (err) =>
-          return res.status(500).send(error: err.toString()) if err
-          res.send(200)
+    catch err
+      res.status(500).send(error: err.toString())
+
+  destroyByQuery: (req, res) =>
+    try
+      @model_type.destroy Utils.parse(req.query), (err) =>
+        console.log "destroyByQuery: #{util.inspect(req.query)}"
+
+        return res.status(500).send(error: err.toString()) if err
+        res.send(200)
     catch err
       res.status(500).send(error: err.toString())
 
