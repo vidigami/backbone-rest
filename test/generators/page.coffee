@@ -22,7 +22,7 @@ runTests = (options, cache, embed) ->
   SYNC = options.sync
   BASE_COUNT = 5
   MODELS_JSON = null
-  ROUTE = options.route
+  ROUTE = "#{DATABASE_URL}/flats"
 
   class Flat extends Backbone.Model
     url: "#{DATABASE_URL}/flats"
@@ -54,7 +54,7 @@ runTests = (options, cache, embed) ->
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
-        .get("/#{ROUTE}")
+        .get(ROUTE)
         .query({$page: true, $limit: LIMIT})
         .set('Accept', 'application/json')
         .end (err, res) ->
@@ -72,7 +72,7 @@ runTests = (options, cache, embed) ->
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
-        .get("/#{ROUTE}?$page&$limit=#{LIMIT}")
+        .get("#{ROUTE}?$page&$limit=#{LIMIT}")
         .set('Accept', 'application/json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
@@ -89,7 +89,7 @@ runTests = (options, cache, embed) ->
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
-        .get("/#{ROUTE}")
+        .get(ROUTE)
         .query({$page: false, $limit: LIMIT})
         .set('Accept', 'application/json')
         .end (err, res) ->
@@ -105,7 +105,7 @@ runTests = (options, cache, embed) ->
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
-        .get("/#{ROUTE}")
+        .get(ROUTE)
         .query({$page: true, $limit: LIMIT, $offset: OFFSET})
         .set('Accept', 'application/json')
         .end (err, res) ->
@@ -123,7 +123,7 @@ runTests = (options, cache, embed) ->
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
-        .get("/#{ROUTE}")
+        .get(ROUTE)
         .query({$page: true, $select: FIELD_NAMES})
         .set('Accept', 'application/json')
         .end (err, res) ->
@@ -140,7 +140,7 @@ runTests = (options, cache, embed) ->
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
-        .get("/#{ROUTE}")
+        .get(ROUTE)
         .query({$page: true, $values: FIELD_NAMES})
         .set('Accept', 'application/json')
         .end (err, res) ->
@@ -161,7 +161,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$page: true, name: model.get('name')})
           .set('Accept', 'application/json')
           .end (err, res) ->

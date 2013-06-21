@@ -22,10 +22,10 @@ runTests = (options, cache, embed) ->
   SYNC = options.sync
   BASE_COUNT = 5
   MODELS_JSON = null
-  ROUTE = options.route
+  ROUTE = "#{DATABASE_URL}/flats"
 
   class Flat extends Backbone.Model
-    url: "#{DATABASE_URL}/flats"
+    url: ROUTE
     sync: SYNC(Flat, cache)
 
   describe "RestController (sorted: false, cache: #{cache} embed: #{embed})", ->
@@ -57,7 +57,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -70,7 +70,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -84,7 +84,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -98,7 +98,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -112,7 +112,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -126,7 +126,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -140,7 +140,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -154,7 +154,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$select: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -168,7 +168,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -182,7 +182,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: ['name']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -196,7 +196,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -210,7 +210,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: 'name'})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -224,7 +224,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -238,7 +238,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -252,7 +252,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -266,7 +266,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
-          .get("/#{ROUTE}")
+          .get(ROUTE)
           .query({$values: ['name', 'created_at']})
           .set('Accept', 'application/json')
           .end (err, res) ->
@@ -285,7 +285,7 @@ runTests = (options, cache, embed) ->
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
-          .get("/#{ROUTE}/#{MODELS_JSON[0].id}")
+          .get("#{ROUTE}/#{MODELS_JSON[0].id}")
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -299,7 +299,7 @@ runTests = (options, cache, embed) ->
 
         attributes = _.clone(MODELS_JSON[0])
         request(app)
-          .get("/#{ROUTE}/#{attributes.id}")
+          .get("#{ROUTE}/#{attributes.id}")
           .set('Accept', 'application/json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -318,7 +318,7 @@ runTests = (options, cache, embed) ->
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
         request(app)
-          .post("/#{ROUTE}")
+          .post(ROUTE)
           .send(attributes)
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -333,7 +333,7 @@ runTests = (options, cache, embed) ->
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
         request(app)
-          .post("/#{ROUTE}")
+          .post(ROUTE)
           .send(attributes)
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -356,7 +356,7 @@ runTests = (options, cache, embed) ->
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
         request(app)
-          .put("/#{ROUTE}/#{attributes.id}")
+          .put("#{ROUTE}/#{attributes.id}")
           .send(attributes)
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -371,7 +371,7 @@ runTests = (options, cache, embed) ->
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
         request(app)
-          .put("/#{ROUTE}/#{attributes.id}")
+          .put("#{ROUTE}/#{attributes.id}")
           .send(attributes)
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -390,13 +390,13 @@ runTests = (options, cache, embed) ->
 
         id = MODELS_JSON[1].id
         request(app)
-          .del("/#{ROUTE}/#{id}")
+          .del("#{ROUTE}/#{id}")
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
 
             request(app)
-              .get("/#{ROUTE}/#{id}")
+              .get("#{ROUTE}/#{id}")
               .end (err, res) ->
                 assert.ok(!err, "no errors: #{err}")
                 assert.equal(res.status, 404, "status 404 on subsequent request. Status: #{res.status}. Body: #{util.inspect(res.body)}")
