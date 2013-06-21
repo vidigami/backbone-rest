@@ -23,7 +23,7 @@ module.exports = class RESTController
       cursor = @model_type.cursor(Utils.parseRawQuery(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) ->
-        if err then res.send(404) else res.json(json)
+        if err then res.send(404) else res.json(if req.query.$count then {result: json} else json)
     catch err
       res.status(500).send(error: err.toString())
 
