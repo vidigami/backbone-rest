@@ -1,7 +1,6 @@
 util = require 'util'
 _ = require 'underscore'
 Utils = require 'backbone-orm/lib/utils'
-JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
 
@@ -10,14 +9,24 @@ module.exports = class RESTController
     @[key] = value for key, value of options
     @white_lists or= {}
 
-    app.get "#{@route}/:id", @show
-    app.get @route, @index
+    if @auth
+      app.get "#{@route}/:id", @auth, @show
+      app.get @route, @auth, @index
 
-    app.post @route, @create
-    app.put "#{@route}/:id", @update
+      app.post @route, @auth, @create
+      app.put "#{@route}/:id", @auth, @update
 
-    app.del "#{@route}/:id", @destroy
-    app.del @route, @destroyByQuery
+      app.del "#{@route}/:id", @auth, @destroy
+      app.del @route, @auth, @destroyByQuery
+    else
+      app.get "#{@route}/:id", @show
+      app.get @route, @index
+
+      app.post @route, @create
+      app.put "#{@route}/:id", @update
+
+      app.del "#{@route}/:id", @destroy
+      app.del @route, @destroyByQuery
 
   index: (req, res) =>
     try
@@ -26,13 +35,18 @@ module.exports = class RESTController
       cursor.toJSON (err, json) =>
         return res.send(404) if err
         return res.json({result: json}) if req.query.$count
-        return res.json(json) unless @renderer
+        return res.json(json) unless @render
 
         # TODO: intgrate the cache -> would need to be done as part of the fetch
-        # TODO: can be optimized by using one model, etc
-        JSONUtils.renderModelsJSON _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))), @renderer, @render_options or {}, (err, json) =>
-          return res.status(500).send(error: err.toString()) if err
-          res.json(json)
+        if req.query.$page
+          @render req, json.rows, (err, rendered_json) =>
+            return res.status(500).send(error: err.toString()) if err
+            json.rows = rendered_json
+            res.json(json)
+        else
+          @render req, json, (err, rendered_json) =>
+            return res.status(500).send(error: err.toString()) if err
+            res.json(rendered_json)
 
     catch err
       res.status(500).send(error: err.toString())
@@ -45,11 +59,13 @@ module.exports = class RESTController
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
-        return res.json(json) unless @renderer
+        return res.json(json) unless @render
 
-        JSONUtils.renderModelJSON new @model_type(@model_type::parse(model_json)), @renderer, @render_options or {}, (err, json) =>
+        # TODO: intgrate the cache -> would need to be done as part of the fetch
+        @render req, json, (err, json) =>
           return res.status(500).send(error: err.toString()) if err
           res.json(json)
+
     catch err
       res.status(500).send(error: err.toString())
 
@@ -61,9 +77,10 @@ module.exports = class RESTController
         success: =>
           json = model.toJSON()
           json = _.pick(json, @white_lists.create) if @white_lists.create
-          return res.json(json) unless @renderer
+          return res.json(json) unless @render
 
-          JSONUtils.renderModelJSON new @model_type(@model_type::parse(model_json)), @renderer, @render_options or {}, (err, json) =>
+          # TODO: intgrate the cache -> would need to be done as part of the fetch
+          @render req, json, (err, json) =>
             return res.status(500).send(error: err.toString()) if err
             res.json(json)
         error: -> res.send(404)
@@ -81,9 +98,10 @@ module.exports = class RESTController
           success: =>
             json = model.toJSON()
             json = _.pick(json, @white_lists.update) if @white_lists.update
-            return res.json(json) unless @renderer
+            return res.json(json) unless @render
 
-            JSONUtils.renderModelJSON new @model_type(@model_type::parse(model_json)), @renderer, @render_options or {}, (err, json) =>
+            # TODO: intgrate the cache -> would need to be done as part of the fetch
+            @render req, json, (err, json) =>
               return res.status(500).send(error: err.toString()) if err
               res.json(json)
           error: -> res.send(404)
