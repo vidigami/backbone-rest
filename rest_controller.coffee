@@ -1,6 +1,7 @@
 util = require 'util'
 _ = require 'underscore'
 Utils = require 'backbone-orm/lib/utils'
+JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
 
@@ -22,8 +23,17 @@ module.exports = class RESTController
     try
       cursor = @model_type.cursor(Utils.parseRawQuery(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
-      cursor.toJSON (err, json) ->
-        if err then res.send(404) else res.json(if req.query.$count then {result: json} else json)
+      cursor.toJSON (err, json) =>
+        return res.send(404) if err
+        return res.json({result: json}) if req.query.$count
+        return res.json(json) unless @renderer
+
+        # TODO: intgrate the cache -> would need to be done as part of the fetch
+        # TODO: can be optimized by using one model, etc
+        JSONUtils.renderModelsJSON _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))), @renderer, @render_options or {}, (err, json) =>
+          return res.status(500).send(error: err.toString()) if err
+          res.json(json)
+
     catch err
       res.status(500).send(error: err.toString())
 
@@ -35,7 +45,11 @@ module.exports = class RESTController
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send("Model not found with id: #{req.params.id}") unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
-        res.json(json)
+        return res.json(json) unless @renderer
+
+        JSONUtils.renderModelJSON new @model_type(@model_type::parse(model_json)), @renderer, @render_options or {}, (err, json) =>
+          return res.status(500).send(error: err.toString()) if err
+          res.json(json)
     catch err
       res.status(500).send(error: err.toString())
 
@@ -47,7 +61,11 @@ module.exports = class RESTController
         success: =>
           json = model.toJSON()
           json = _.pick(json, @white_lists.create) if @white_lists.create
-          res.json(json)
+          return res.json(json) unless @renderer
+
+          JSONUtils.renderModelJSON new @model_type(@model_type::parse(model_json)), @renderer, @render_options or {}, (err, json) =>
+            return res.status(500).send(error: err.toString()) if err
+            res.json(json)
         error: -> res.send(404)
       }
     catch err
@@ -63,7 +81,11 @@ module.exports = class RESTController
           success: =>
             json = model.toJSON()
             json = _.pick(json, @white_lists.update) if @white_lists.update
-            res.json(json)
+            return res.json(json) unless @renderer
+
+            JSONUtils.renderModelJSON new @model_type(@model_type::parse(model_json)), @renderer, @render_options or {}, (err, json) =>
+              return res.status(500).send(error: err.toString()) if err
+              res.json(json)
           error: -> res.send(404)
         }
     catch err
