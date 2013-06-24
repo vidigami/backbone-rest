@@ -1,7 +1,7 @@
 {
   "name": "backbone-rest",
   "version": "0.0.1",
-  "main": "rest-controller.coffee",
+  "main": "rest_controller.coffee",
   "private": true,
   "repository" : { "type" : "git", "url" : "https://bitbucket.org/vidigami/backbone-rest.git"},
   "scripts": {
