@@ -35,6 +35,7 @@ module.exports = class RESTController
       cursor.toJSON (err, json) =>
         return res.send(404) if err
         return res.json({result: json}) if req.query.$count
+        return res.json(json) unless json
         return res.json(json) unless @render
 
         # TODO: intgrate the cache -> would need to be done as part of the fetch
