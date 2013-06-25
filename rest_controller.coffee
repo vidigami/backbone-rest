@@ -35,7 +35,11 @@ module.exports = class RESTController
       cursor.toJSON (err, json) =>
         return res.send(404) if err
         return res.json({result: json}) if req.query.$count
-        return res.json(json) unless json
+        unless json
+          if req.query.$one
+            return res.status(404).send(error: "Model not found with id: #{req.query.id}")
+          else
+            res.json(json)
         return res.json(json) unless @render
 
         # TODO: intgrate the cache -> would need to be done as part of the fetch
@@ -58,7 +62,7 @@ module.exports = class RESTController
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
       cursor.toJSON (err, json) =>
         return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send("Model not found with id: #{req.params.id}") unless json
+        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
         return res.json(json) unless @render
 
@@ -94,7 +98,7 @@ module.exports = class RESTController
       json = if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body
       @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send("Model not found with id: #{req.params.id}") unless model
+        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
         model.save model.parse(json), {
           success: =>
             json = model.toJSON()
