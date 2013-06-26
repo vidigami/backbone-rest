@@ -9,7 +9,7 @@ module.exports = class RESTController
   constructor: (app, options={}) ->
     @[key] = value for key, value of options
     @white_lists or= {}
-    @views or= {}
+    @templates or= {}
 
     if @auth
       app.get "#{@route}/:id", @auth, @show
@@ -131,12 +131,12 @@ module.exports = class RESTController
       res.status(500).send(error: err.toString())
 
   render: (req, json, callback) ->
-    view_name = req.query.$view or @default_view
-    return callback(null, json) unless view_name
-    return callback(new Error "Unrecognized view: #{view_name}") unless view = @views[view_name]
+    template_name = req.query.$render or req.query.$template or @default_template
+    return callback(null, json) unless template_name
+    return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
 
-    options = (if @viewOptions then @viewOptions(req, view_name) else {})
+    options = (if @templateOptions then @templateOptions(req, template_name) else {})
     if _.isArray(json)
-      JSONUtils.renderModelsJSON _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))), view, options, callback
+      JSONUtils.renderModelsJSON _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))), template, options, callback
     else
-      JSONUtils.renderModelJSON new @model_type(@model_type::parse(json)), view, options, callback
+      JSONUtils.renderModelJSON new @model_type(@model_type::parse(json)), template, options, callback
