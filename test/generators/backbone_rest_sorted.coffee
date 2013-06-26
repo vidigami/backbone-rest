@@ -6,7 +6,6 @@ Queue = require 'queue-async'
 
 Fabricator = require 'backbone-orm/fabricator'
 Utils = require 'backbone-orm/lib/utils'
-adapters = Utils.adapters
 
 request = require 'supertest'
 express = require 'express'
