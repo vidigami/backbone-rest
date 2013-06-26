@@ -1,6 +1,7 @@
 util = require 'util'
 _ = require 'underscore'
 Utils = require 'backbone-orm/lib/utils'
+JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
 
@@ -8,6 +9,7 @@ module.exports = class RESTController
   constructor: (app, options={}) ->
     @[key] = value for key, value of options
     @white_lists or= {}
+    @views or= {}
 
     if @auth
       app.get "#{@route}/:id", @auth, @show
@@ -40,9 +42,7 @@ module.exports = class RESTController
             return res.status(404).send(error: "Model not found with id: #{req.query.id}")
           else
             res.json(json)
-        return res.json(json) unless @render
 
-        # TODO: intgrate the cache -> would need to be done as part of the fetch
         if req.query.$page
           @render req, json.rows, (err, rendered_json) =>
             return res.status(500).send(error: err.toString()) if err
@@ -64,9 +64,7 @@ module.exports = class RESTController
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
-        return res.json(json) unless @render
 
-        # TODO: intgrate the cache -> would need to be done as part of the fetch
         @render req, json, (err, json) =>
           return res.status(500).send(error: err.toString()) if err
           res.json(json)
@@ -82,9 +80,7 @@ module.exports = class RESTController
         success: =>
           json = model.toJSON()
           json = _.pick(json, @white_lists.create) if @white_lists.create
-          return res.json(json) unless @render
 
-          # TODO: intgrate the cache -> would need to be done as part of the fetch
           @render req, json, (err, json) =>
             return res.status(500).send(error: err.toString()) if err
             res.json(json)
@@ -103,9 +99,7 @@ module.exports = class RESTController
           success: =>
             json = model.toJSON()
             json = _.pick(json, @white_lists.update) if @white_lists.update
-            return res.json(json) unless @render
 
-            # TODO: intgrate the cache -> would need to be done as part of the fetch
             @render req, json, (err, json) =>
               return res.status(500).send(error: err.toString()) if err
               res.json(json)
@@ -136,23 +130,13 @@ module.exports = class RESTController
     catch err
       res.status(500).send(error: err.toString())
 
+  render: (req, json, callback) ->
+    view_name = req.query.$view or @default_view
+    return callback(null, json) unless view_name
+    return callback(new Error "Unrecognized view: #{view_name}") unless view = @views[view_name]
 
-# TODO: allow for external caller to set CORS
-# # allow cross-origin
-# app.all route, (req, res, next) ->
-#   res.set('Access-Control-Allow-Origin', bind_options.origins)
-#   res.set('Access-Control-Allow-Headers', 'X-Requested-With,CONTENT-TYPE')
-#   res.set('Access-Control-Allow-Methods', 'GET,POST,PUT')
-#   next()
-# app.all "#{route}/:id", (req, res, next) ->
-#   res.set('Access-Control-Allow-Origin', bind_options.origins)
-#   res.set('Access-Control-Allow-Headers', 'X-Requested-With,CONTENT-TYPE')
-#   res.set('Access-Control-Allow-Methods', 'GET,PUT,DELETE')
-#   next()
-#   _enableCors: (app, url) =>
-#     app.all url, (req, res, next) ->
-#       res.set 'Access-Control-Allow-Origin', cors.origins if cors.origins
-#       res.header 'Access-Control-Allow-Headers', 'X-Requested-With,Content-Disposition,Content-Type,Content-Description,Content-Range'
-#       res.header 'Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE, OPTIONS'
-#       res.header('Access-Control-Allow-Credentials', 'true')
-#       next()
+    options = (if @viewOptions then @viewOptions(req, view_name) else {})
+    if _.isArray(json)
+      JSONUtils.renderModelsJSON _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))), view, options, callback
+    else
+      JSONUtils.renderModelJSON new @model_type(@model_type::parse(json)), view, options, callback
