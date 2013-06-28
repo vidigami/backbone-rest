@@ -25,6 +25,9 @@ runTests = (options, cache, embed) ->
 
   class Flat extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/flats"
+    @schema: _.defaults({
+      boolean: 'Boolean'
+    }, BASE_SCHEMA)
     sync: SYNC(Flat, cache)
 
   describe "RestController (sorted: true, cache: #{cache} embed: #{embed})", ->
