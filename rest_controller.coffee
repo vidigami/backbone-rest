@@ -135,8 +135,6 @@ module.exports = class RESTController
     return callback(null, json) unless template_name
     return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
 
-    options = (if @templateOptions then @templateOptions(req, template_name) else {})
-    if _.isArray(json)
-      JSONUtils.renderModelsJSON _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))), template, options, callback
-    else
-      JSONUtils.renderModelJSON new @model_type(@model_type::parse(json)), template, options, callback
+    options = (if @renderOptions then @renderOptions(req, template_name) else {})
+    models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
+    JSONUtils.renderJSON models, template, options, callback
