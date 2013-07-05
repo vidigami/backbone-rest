@@ -155,7 +155,7 @@ runTests = (options, cache, embed) ->
           done()
 
     it 'Ensure the correct value is returned', (done) ->
-      Flat.find {$one: true}, (err, model) ->
+      Flat.findOne (err, model) ->
         assert.ok(!err, "No errors: #{err}")
         assert.ok(!!model, 'model')
 
