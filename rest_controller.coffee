@@ -1,6 +1,6 @@
 util = require 'util'
 _ = require 'underscore'
-Utils = require 'backbone-orm/lib/utils'
+ORMUtils = require 'backbone-orm/lib/utils'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
@@ -32,7 +32,7 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      cursor = @model_type.cursor(Utils.parseRawQuery(req.query))
+      cursor = @model_type.cursor(ORMUtils.parseRawQuery(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
