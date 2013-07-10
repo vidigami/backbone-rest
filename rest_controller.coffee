@@ -32,7 +32,7 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      cursor = @model_type.cursor(ORMUtils.parseRawQuery(req.query))
+      cursor = @model_type.cursor(ORMUtils.parseValues(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
@@ -124,7 +124,7 @@ module.exports = class RESTController
 
   destroyByQuery: (req, res) =>
     try
-      @model_type.destroy Utils.parseRawQuery(req.query), (err) =>
+      @model_type.destroy Utils.parseValues(req.query), (err) =>
         return res.status(500).send(error: err.toString()) if err
         res.send(200)
     catch err
