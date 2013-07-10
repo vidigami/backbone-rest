@@ -3,14 +3,21 @@
   "version": "0.0.1",
   "main": "rest_controller",
   "private": true,
-  "repository" : { "type" : "git", "url" : "https://bitbucket.org/vidigami/backbone-rest.git"},
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/vidigami/backbone-rest.git"
+  },
   "scripts": {
     "test": "NODE_ENV=test mocha test/suite.coffee --compilers coffee:coffee-script --reporter spec"
   },
   "devDependencies": {
     "mocha": "*",
     "express": "3.2.x",
-    "supertest": "0.7.0"
+    "supertest": "0.7.0",
+    "grunt": "0.4.x",
+    "grunt-contrib-coffee": "0.7.x",
+    "grunt-contrib-copy": "0.4.x",
+    "grunt-contrib-watch": "0.4.x"
   },
   "dependencies": {
     "coffee-script": "*",
