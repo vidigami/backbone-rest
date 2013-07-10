@@ -74,7 +74,7 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
-      json = if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body
+      json = ORMUtils.parseValues(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
       model.save {}, {
         success: =>
@@ -91,7 +91,7 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
-      json = if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body
+      json = ORMUtils.parseValues(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
       @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
