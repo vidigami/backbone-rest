@@ -1,6 +1,6 @@
 {
   "name": "backbone-rest",
-  "version": "0.0.1",
+  "version": "0.0.1a",
   "main": "rest_controller",
   "private": true,
   "repository": {
@@ -23,7 +23,7 @@
     "coffee-script": "*",
     "underscore": "1.4.x",
     "backbone": "1.0.x",
-    "backbone-orm": "git+https://dvidi:U5RqFaNC@bitbucket.org/vidigami/backbone-orm",
+    "backbone-orm": "git+https://dvidi:U5RqFaNC@bitbucket.org/vidigami/backbone-orm#0.0.1d",
     "queue-async": "1.0.x"
   }
 }
