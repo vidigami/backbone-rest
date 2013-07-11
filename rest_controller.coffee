@@ -32,7 +32,7 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      cursor = @model_type.cursor(ORMUtils.parseValues(req.query))
+      cursor = @model_type.cursor(JSONUtils.parse(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
@@ -74,7 +74,7 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
-      json = ORMUtils.parseValues(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
+      json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
       model.save {}, {
         success: =>
@@ -91,7 +91,7 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
-      json = ORMUtils.parseValues(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
+      json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
       @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
@@ -124,7 +124,7 @@ module.exports = class RESTController
 
   destroyByQuery: (req, res) =>
     try
-      @model_type.destroy Utils.parseValues(req.query), (err) =>
+      @model_type.destroy JSONUtils.parse(req.query), (err) =>
         return res.status(500).send(error: err.toString()) if err
         res.send(200)
     catch err

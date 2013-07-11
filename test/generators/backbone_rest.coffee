@@ -5,7 +5,7 @@ Backbone = require 'backbone'
 Queue = require 'queue-async'
 
 Fabricator = require 'backbone-orm/fabricator'
-Utils = require 'backbone-orm/lib/utils'
+JSONUtils = require 'backbone-orm/lib/json_utils'
 
 request = require 'supertest'
 express = require 'express'
@@ -64,7 +64,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = MODELS_JSON, actual = sortO(Utils.parseValues(res.body), 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = MODELS_JSON, actual = sortO(JSONUtils.parse(res.body), 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by single key', (done) ->
@@ -120,7 +120,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = sortO(Utils.parseValues(res.body), 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = sortO(JSONUtils.parse(res.body), 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
@@ -134,7 +134,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = sortO(Utils.parseValues(res.body), 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = sortO(JSONUtils.parse(res.body), 'name'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
@@ -148,7 +148,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortO(_.map(MODELS_JSON, (item) -> _.pick(item, ['created_at'])), 'created_at'), actual = sortO(Utils.parseValues(res.body), 'created_at'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortO(_.map(MODELS_JSON, (item) -> _.pick(item, ['created_at'])), 'created_at'), actual = sortO(JSONUtils.parse(res.body), 'created_at'), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
@@ -232,7 +232,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = sortA(Utils.parseValues(res.body)), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = sortA(JSONUtils.parse(res.body)), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
@@ -246,7 +246,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = sortA(Utils.parseValues(res.body)), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = sortA(JSONUtils.parse(res.body)), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
@@ -292,7 +292,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = MODELS_JSON[0], actual = Utils.parseValues(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = MODELS_JSON[0], actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
       it 'should find an existing model with whitelist', (done) ->
@@ -306,7 +306,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.pick(attributes, ['id', 'name', 'created_at']), actual = Utils.parseValues(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = _.pick(attributes, ['id', 'name', 'created_at']), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
     ######################################
@@ -363,7 +363,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(_.omit(attributes, '_rev'), _.omit(Utils.parseValues(res.body), '_rev'), 'model was updated') # there could be _rev added
+            assert.deepEqual(_.omit(attributes, '_rev'), _.omit(JSONUtils.parse(res.body), '_rev'), 'model was updated') # there could be _rev added
             done()
 
       it 'should update an existing model with whitelist', (done) ->
@@ -378,7 +378,7 @@ runTests = (options, cache, embed) ->
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(_.pick(attributes, ['id', 'name', 'updated_at']), Utils.parseValues(res.body), 'model was updated')
+            assert.deepEqual(_.pick(attributes, ['id', 'name', 'updated_at']), JSONUtils.parse(res.body), 'model was updated')
             done()
 
     ######################################
