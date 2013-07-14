@@ -137,4 +137,4 @@ module.exports = class RESTController
 
     options = (if @renderOptions then @renderOptions(req, template_name) else {})
     models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
-    JSONUtils.renderJSON models, template, options, callback
+    JSONUtils.renderTemplate models, template, options, callback
