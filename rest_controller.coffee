@@ -11,24 +11,14 @@ module.exports = class RESTController
     @white_lists or= {}
     @templates or= {}
 
-    if @auth
-      app.get "#{@route}/:id", @auth, @show
-      app.get @route, @auth, @index
+    app.get "#{@route}/:id", @_call(@show)
+    app.get @route, @_call(@index)
 
-      app.post @route, @auth, @create
-      app.put "#{@route}/:id", @auth, @update
+    app.post @route, @_call(@create)
+    app.put "#{@route}/:id", @_call(@update)
 
-      app.del "#{@route}/:id", @auth, @destroy
-      app.del @route, @auth, @destroyByQuery
-    else
-      app.get "#{@route}/:id", @show
-      app.get @route, @index
-
-      app.post @route, @create
-      app.put "#{@route}/:id", @update
-
-      app.del "#{@route}/:id", @destroy
-      app.del @route, @destroyByQuery
+    app.del "#{@route}/:id", @_call(@destroy)
+    app.del @route, @_call(@destroyByQuery)
 
   index: (req, res) =>
     try
@@ -138,3 +128,9 @@ module.exports = class RESTController
     options = (if @renderOptions then @renderOptions(req, template_name) else {})
     models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
     JSONUtils.renderJSON models, template, options, callback
+
+  _call: (fn) =>
+    auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
+    auths.push(fn)
+    return auths
+
