@@ -1,6 +1,6 @@
 util = require 'util'
 _ = require 'underscore'
-Utils = require 'backbone-orm/lib/utils'
+ORMUtils = require 'backbone-orm/lib/utils'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
@@ -22,7 +22,7 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      cursor = @model_type.cursor(Utils.parseRawQuery(req.query))
+      cursor = @model_type.cursor(JSONUtils.parse(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
@@ -64,7 +64,7 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
-      json = if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body
+      json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
       model.save {}, {
         success: =>
@@ -81,7 +81,7 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
-      json = if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body
+      json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
       @model_type.find req.params.id, (err, model) =>
         return res.status(404).send(error: err.toString()) if err
         return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
@@ -114,7 +114,7 @@ module.exports = class RESTController
 
   destroyByQuery: (req, res) =>
     try
-      @model_type.destroy Utils.parseRawQuery(req.query), (err) =>
+      @model_type.destroy JSONUtils.parse(req.query), (err) =>
         return res.status(500).send(error: err.toString()) if err
         res.send(200)
     catch err
@@ -127,10 +127,9 @@ module.exports = class RESTController
 
     options = (if @renderOptions then @renderOptions(req, template_name) else {})
     models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
-    JSONUtils.renderJSON models, template, options, callback
+    JSONUtils.renderTemplate models, template, options, callback
 
   _call: (fn) =>
     auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
     auths.push(fn)
     return auths
-
