@@ -74,7 +74,7 @@ module.exports = class RESTController
           @render req, json, (err, json) =>
             return res.status(500).send(error: err.toString()) if err
             res.json(json)
-        error: -> res.send(404)
+          error: (model, err) -> return res.status(500).send("Error creating model:", error: err.toString()) if err
       }
     catch err
       res.status(500).send(error: err.toString())
@@ -93,7 +93,7 @@ module.exports = class RESTController
             @render req, json, (err, json) =>
               return res.status(500).send(error: err.toString()) if err
               res.json(json)
-          error: -> res.send(404)
+          error: (model, err) -> return res.status(500).send("Error saving model:", error: err.toString()) if err
         }
     catch err
       res.status(500).send(error: err.toString())
