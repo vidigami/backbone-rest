@@ -20,6 +20,9 @@ module.exports = class RESTController
     app.del "#{@route}/:id", @_call(@destroy)
     app.del @route, @_call(@destroyByQuery)
 
+    app.head "#{@route}/:id", @_call(@head)
+    app.head @route, @_call(@headByQuery)
+
   index: (req, res) =>
     try
       cursor = @model_type.cursor(JSONUtils.parse(req.query))
@@ -117,6 +120,22 @@ module.exports = class RESTController
       @model_type.destroy JSONUtils.parse(req.query), (err) =>
         return res.status(500).send(error: err.toString()) if err
         res.send(200)
+    catch err
+      res.status(500).send(error: err.toString())
+
+  head: (req, res) =>
+    try
+      @model_type.exists req.params.id, (err, exists) =>
+        return res.status(500).send(error: err.toString()) if err
+        res.send(if exists then 200 else 404)
+    catch err
+      res.status(500).send(error: err.toString())
+
+  headByQuery: (req, res) =>
+    try
+      @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
+        return res.status(500).send(error: err.toString()) if err
+        res.send(if exists then 200 else 404)
     catch err
       res.status(500).send(error: err.toString())
 

@@ -404,6 +404,66 @@ runTests = (options, cache, embed) ->
                 assert.equal(res.status, 404, "status 404 on subsequent request. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                 done()
 
+    ######################################
+    # head
+    ######################################
+
+    describe 'head', ->
+      it 'should test existence of a model by id', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        id = MODELS_JSON[1].id
+        request(app)
+          .head("#{ROUTE}/#{id}")
+          .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+            # delete it
+            request(app)
+              .del("#{ROUTE}/#{id}")
+              .end (err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+                # check again
+                request(app)
+                  .head("#{ROUTE}/#{id}")
+                  .end (err, res) ->
+                    assert.ok(!err, "no errors: #{err}")
+                    assert.equal(res.status, 404, "status not 404. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                    done()
+
+      it 'should test existence of a model by name', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        id = MODELS_JSON[1].id
+        name = MODELS_JSON[1].name
+        request(app)
+          .head("#{ROUTE}")
+          .query({name: name})
+          .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+            # delete it
+            request(app)
+              .del("#{ROUTE}/#{id}")
+              .end (err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+                # check again
+                request(app)
+                  .head("#{ROUTE}")
+                  .query({name: name})
+                  .end (err, res) ->
+                    assert.ok(!err, "no errors: #{err}")
+                    assert.equal(res.status, 404, "status not 404. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                    done()
+
 # TODO: explain required set up
 
 # each model should have available attribute 'id', 'name', 'created_at', 'updated_at', etc....
