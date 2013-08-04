@@ -43,7 +43,7 @@ runTests = (options, cache, embed) ->
         updated_at: Fabricator.date
       }, (err, models) ->
         return callback(err) if err
-        MODELS_JSON = sortO(_.map(models, (test) -> test.toJSON()), 'name') # need to sort because not sure what order will come back from database
+        MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
         callback()
       )
 
