@@ -29,7 +29,7 @@ module.exports = class RESTController
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
-        return res.json({result: json}) if req.query.$count
+        return res.json({result: json}) if (req.query.$count or req.query.$exists)
         unless json
           if req.query.$one
             return res.status(404).send(error: "Model not found with id: #{req.query.id}")
