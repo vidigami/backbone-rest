@@ -38,7 +38,7 @@ module.exports = class RESTController
         return res.json({result: json}) if (req.query.$count or req.query.$exists)
         unless json
           if req.query.$one
-            return res.status(404).send(error: "Model not found with id: #{req.query.id}")
+            return res.status(404).send()
           else
             res.json(json)
 
@@ -60,8 +60,8 @@ module.exports = class RESTController
       cursor = @model_type.cursor(req.params.id)
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
       cursor.toJSON (err, json) =>
-        return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless json
+        return res.status(500).send(error: err.toString()) if err
+        return res.status(404).send() unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
 
         @render req, json, (err, json) =>
@@ -92,8 +92,8 @@ module.exports = class RESTController
     try
       json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
       @model_type.find req.params.id, (err, model) =>
-        return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
+        return res.status(500).send(error: err.toString()) if err
+        return res.status(404).send() unless model
         model.save model.parse(json), {
           success: =>
             json = model.toJSON()
@@ -111,10 +111,10 @@ module.exports = class RESTController
     try
       @model_type.exists req.params.id, (err, exists) =>
         return res.status(500).send(error: err.toString()) if err
-        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless exists
+        return res.status(404).send() unless exists
 
         @model_type.destroy {id: req.params.id}, (err) ->
-          return res.status(500).send(error: "Model not deleted with id: #{req.params.id}") if err
+          return res.status(500).send(error: err.toString()) if err
           res.status(200).send()
 
     catch err
