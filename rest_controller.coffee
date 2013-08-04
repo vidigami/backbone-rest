@@ -109,15 +109,14 @@ module.exports = class RESTController
 
   destroy: (req, res) =>
     try
-      # TODO: is there a way to do this without the model? eg. transaction only (with confirmation of existence) - HEAD?
-      if req.params.id
-        @model_type.find req.params.id, (err, model) =>
-          return res.status(500).send(error: err.toString()) if err
-          return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
-          model.destroy {
-            success: -> res.status(200).send()
-            error: -> res.status(500).send(error: "Model not deleted with id: #{req.params.id}")
-          }
+      @model_type.exists req.params.id, (err, exists) =>
+        return res.status(500).send(error: err.toString()) if err
+        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless exists
+
+        @model_type.destroy {id: req.params.id}, (err) ->
+          return res.status(500).send(error: "Model not deleted with id: #{req.params.id}") if err
+          res.status(200).send()
+
     catch err
       res.status(500).send(error: err.toString())
 
