@@ -285,5 +285,5 @@ runTests = (options, cache, embed) ->
 module.exports = (options) ->
   runTests(options, false, false)
   runTests(options, true, false)
-  # runTests(options, false, true) if options.embed # TODO
-  # runTests(options, true, true) if options.embed # TODO
+  runTests(options, false, true) if options.embed # TODO
+  runTests(options, true, true) if options.embed # TODO

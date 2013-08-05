@@ -29,14 +29,14 @@ module.exports = class RESTController
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
-        return res.json({result: json}) if (req.query.$count or req.query.$exists)
+        return res.json({result: json}) if (cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists'))
         unless json
           if req.query.$one
             return res.status(404).send()
           else
             res.json(json)
 
-        if req.query.$page
+        if cursor.hasCursorQuery('$page')
           @render req, json.rows, (err, rendered_json) =>
             return res.status(500).send(error: err.toString()) if err
             json.rows = rendered_json
