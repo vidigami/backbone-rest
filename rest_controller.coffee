@@ -88,7 +88,7 @@ module.exports = class RESTController
         return res.status(500).send(error: err.toString()) if err
         return res.status(404).send() unless model
         model.save model.parse(json), bbCallback (err) =>
-          return res.send(404) if err
+          return res.status(500).send(error: err.toString()) if err
 
           json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
           @render req, json, (err, json) =>
