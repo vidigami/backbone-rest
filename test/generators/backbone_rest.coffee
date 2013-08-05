@@ -43,8 +43,10 @@ runTests = (options, cache, embed) ->
         updated_at: Fabricator.date
       }, (err, models) ->
         return callback(err) if err
-        MODELS_JSON = sortO(_.map(models, (test) -> test.toJSON()), 'name') # need to sort because not sure what order will come back from database
-        callback()
+        Flat.find {id: {$in: _.map(models, (test) -> test.id)}}, (err, models) -> # reload models in case they are stored with different date precision
+          return callback(err) if err
+          MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
+          callback()
       )
 
       queue.await done
@@ -404,6 +406,127 @@ runTests = (options, cache, embed) ->
                 assert.equal(res.status, 404, "status 404 on subsequent request. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                 done()
 
+    ######################################
+    # head
+    ######################################
+
+    describe 'head', ->
+      it 'should test existence of a model by id', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        id = MODELS_JSON[1].id
+        request(app)
+          .head("#{ROUTE}/#{id}")
+          .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+            # delete it
+            request(app)
+              .del("#{ROUTE}/#{id}")
+              .end (err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+                # check again
+                request(app)
+                  .head("#{ROUTE}/#{id}")
+                  .end (err, res) ->
+                    assert.ok(!err, "no errors: #{err}")
+                    assert.equal(res.status, 404, "status not 404. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                    done()
+
+      it 'should test existence of a model by id ($exists)', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        id = MODELS_JSON[1].id
+        request(app)
+          .get("#{ROUTE}")
+          .query({id: id, $exists: ''})
+          .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(res.body.result, "Exists by id. Body: #{util.inspect(res.body)}")
+
+            # delete it
+            request(app)
+              .del("#{ROUTE}/#{id}")
+              .end (err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+                # check again
+                request(app)
+                  .get("#{ROUTE}")
+                  .query({id: id, $exists: ''})
+                  .end (err, res) ->
+                    assert.ok(!err, "no errors: #{err}")
+                    assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                    assert.ok(!res.body.result, "Not longer exists by id. Body: #{util.inspect(res.body)}")
+                    done()
+
+      it 'should test existence of a model by name', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        id = MODELS_JSON[1].id
+        name = MODELS_JSON[1].name
+        request(app)
+          .head("#{ROUTE}")
+          .query({name: name})
+          .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+            # delete it
+            request(app)
+              .del("#{ROUTE}/#{id}")
+              .end (err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+                # check again
+                request(app)
+                  .head("#{ROUTE}")
+                  .query({name: name})
+                  .end (err, res) ->
+                    assert.ok(!err, "no errors: #{err}")
+                    assert.equal(res.status, 404, "status not 404. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                    done()
+
+      it 'should test existence of a model by name ($exists)', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        id = MODELS_JSON[1].id
+        name = MODELS_JSON[1].name
+        request(app)
+          .get("#{ROUTE}")
+          .query({name: name, $exists: ''})
+          .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(res.body.result, "Exists by name. Body: #{util.inspect(res.body)}")
+
+            # delete it
+            request(app)
+              .del("#{ROUTE}/#{id}")
+              .end (err, res) ->
+                assert.ok(!err, "no errors: #{err}")
+                assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+
+                # check again
+                request(app)
+                  .get("#{ROUTE}")
+                  .query({name: name, $exists: ''})
+                  .end (err, res) ->
+                    assert.ok(!err, "no errors: #{err}")
+                    assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                    assert.ok(!res.body.result, "No longer exists by name. Body: #{util.inspect(res.body)}")
+                    done()
+
 # TODO: explain required set up
 
 # each model should have available attribute 'id', 'name', 'created_at', 'updated_at', etc....
@@ -411,5 +534,5 @@ runTests = (options, cache, embed) ->
 module.exports = (options) ->
   runTests(options, false, false)
   runTests(options, true, false)
-  # runTests(options, false, true) if options.embed # TODO
-  # runTests(options, true, true) if options.embed # TODO
+  runTests(options, false, true) if options.embed # TODO
+  runTests(options, true, true) if options.embed # TODO

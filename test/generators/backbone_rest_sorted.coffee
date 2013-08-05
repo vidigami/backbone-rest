@@ -43,8 +43,10 @@ runTests = (options, cache, embed) ->
         updated_at: Fabricator.date
       }, (err, models) ->
         return callback(err) if err
-        MODELS_JSON = sortO(_.map(models, (test) -> test.toJSON()), 'name') # need to sort because not sure what order will come back from database
-        callback()
+        Flat.find {id: {$in: _.map(models, (test) -> test.id)}}, (err, models) -> # reload models in case they are stored with different date precision
+          return callback(err) if err
+          MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
+          callback()
       )
 
       queue.await done
@@ -285,5 +287,5 @@ runTests = (options, cache, embed) ->
 module.exports = (options) ->
   runTests(options, false, false)
   runTests(options, true, false)
-  # runTests(options, false, true) if options.embed # TODO
-  # runTests(options, true, true) if options.embed # TODO
+  runTests(options, false, true) if options.embed # TODO
+  runTests(options, true, true) if options.embed # TODO

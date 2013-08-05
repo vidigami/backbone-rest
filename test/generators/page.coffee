@@ -5,7 +5,7 @@ Backbone = require 'backbone'
 Queue = require 'queue-async'
 
 Fabricator = require 'backbone-orm/fabricator'
-Utils = require 'backbone-orm/lib/utils'
+JSONUtils = require 'backbone-orm/lib/json_utils'
 
 request = require 'supertest'
 express = require 'express'
@@ -43,8 +43,10 @@ runTests = (options, cache, embed) ->
         updated_at: Fabricator.date
       }, (err, models) ->
         return callback(err) if err
-        MODELS_JSON = sortO(_.map(models, (test) -> test.toJSON()), 'name') # need to sort because not sure what order will come back from database
-        callback()
+        Flat.find {id: {$in: _.map(models, (test) -> test.id)}}, (err, models) -> # reload models in case they are stored with different date precision
+          return callback(err) if err
+          MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
+          callback()
       )
 
       queue.await done
@@ -171,7 +173,7 @@ runTests = (options, cache, embed) ->
             assert.ok(!!data = res.body, 'got data')
             assert.equal(data.total_rows, 1, 'has the correct total_rows')
             assert.equal(data.rows.length, 1, 'has the correct row.length')
-            assert.deepEqual(expected = JSON.stringify(model.toJSON()), actual = JSON.stringify(data.rows[0]), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = model.toJSON(), actual = JSONUtils.parse(data.rows[0]), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
 # TODO: explain required set up
@@ -181,5 +183,5 @@ runTests = (options, cache, embed) ->
 module.exports = (options) ->
   runTests(options, false, false)
   runTests(options, true, false)
-  # runTests(options, false, true) if options.embed # TODO
-  # runTests(options, true, true) if options.embed # TODO
+  runTests(options, false, true) if options.embed # TODO
+  runTests(options, true, true) if options.embed # TODO

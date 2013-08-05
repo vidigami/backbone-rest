@@ -1,6 +1,7 @@
 util = require 'util'
 _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
+bbCallback = ORMUtils.bbCallback
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
@@ -20,20 +21,23 @@ module.exports = class RESTController
     app.del "#{@route}/:id", @_call(@destroy)
     app.del @route, @_call(@destroyByQuery)
 
+    app.head "#{@route}/:id", @_call(@head)
+    app.head @route, @_call(@headByQuery)
+
   index: (req, res) =>
     try
       cursor = @model_type.cursor(JSONUtils.parse(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
-        return res.json({result: json}) if req.query.$count
+        return res.json({result: json}) if (cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists'))
         unless json
           if req.query.$one
-            return res.status(404).send(error: "Model not found with id: #{req.query.id}")
+            return res.status(404).send()
           else
             res.json(json)
 
-        if req.query.$page
+        if cursor.hasCursorQuery('$page')
           @render req, json.rows, (err, rendered_json) =>
             return res.status(500).send(error: err.toString()) if err
             json.rows = rendered_json
@@ -51,8 +55,8 @@ module.exports = class RESTController
       cursor = @model_type.cursor(req.params.id)
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
       cursor.toJSON (err, json) =>
-        return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless json
+        return res.status(500).send(error: err.toString()) if err
+        return res.status(404).send() unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
 
         @render req, json, (err, json) =>
@@ -66,16 +70,14 @@ module.exports = class RESTController
     try
       json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
-      model.save {}, {
-        success: =>
-          json = model.toJSON()
-          json = _.pick(json, @white_lists.create) if @white_lists.create
+      model.save {}, bbCallback (err) =>
+        return res.status(500).send(error: err.toString()) if err
 
-          @render req, json, (err, json) =>
-            return res.status(500).send(error: err.toString()) if err
-            res.json(json)
-          error: (model, err) -> return res.status(500).send("Error creating model:", error: err.toString()) if err
-      }
+        json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
+        @render req, json, (err, json) =>
+          return res.status(500).send(error: err.toString()) if err
+          res.json(json)
+
     catch err
       res.status(500).send(error: err.toString())
 
@@ -83,32 +85,29 @@ module.exports = class RESTController
     try
       json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
       @model_type.find req.params.id, (err, model) =>
-        return res.status(404).send(error: err.toString()) if err
-        return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
-        model.save model.parse(json), {
-          success: =>
-            json = model.toJSON()
-            json = _.pick(json, @white_lists.update) if @white_lists.update
+        return res.status(500).send(error: err.toString()) if err
+        return res.status(404).send() unless model
+        model.save model.parse(json), bbCallback (err) =>
+          return res.status(500).send(error: err.toString()) if err
 
-            @render req, json, (err, json) =>
-              return res.status(500).send(error: err.toString()) if err
-              res.json(json)
-          error: (model, err) -> return res.status(500).send("Error saving model:", error: err.toString()) if err
-        }
+          json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
+          @render req, json, (err, json) =>
+            return res.status(500).send(error: err.toString()) if err
+            res.json(json)
+
     catch err
       res.status(500).send(error: err.toString())
 
   destroy: (req, res) =>
     try
-      # TODO: is there a way to do this without the model? eg. transaction only (with confirmation of existence) - HEAD?
-      if req.params.id
-        @model_type.find req.params.id, (err, model) =>
+      @model_type.exists req.params.id, (err, exists) =>
+        return res.status(500).send(error: err.toString()) if err
+        return res.status(404).send() unless exists
+
+        @model_type.destroy {id: req.params.id}, (err) ->
           return res.status(500).send(error: err.toString()) if err
-          return res.status(404).send(error: "Model not found with id: #{req.params.id}") unless model
-          model.destroy {
-            success: -> res.status(200).send()
-            error: -> res.status(500).send(error: "Model not deleted with id: #{req.params.id}")
-          }
+          res.status(200).send()
+
     catch err
       res.status(500).send(error: err.toString())
 
@@ -117,6 +116,22 @@ module.exports = class RESTController
       @model_type.destroy JSONUtils.parse(req.query), (err) =>
         return res.status(500).send(error: err.toString()) if err
         res.send(200)
+    catch err
+      res.status(500).send(error: err.toString())
+
+  head: (req, res) =>
+    try
+      @model_type.exists req.params.id, (err, exists) =>
+        return res.status(500).send(error: err.toString()) if err
+        res.send(if exists then 200 else 404)
+    catch err
+      res.status(500).send(error: err.toString())
+
+  headByQuery: (req, res) =>
+    try
+      @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
+        return res.status(500).send(error: err.toString()) if err
+        res.send(if exists then 200 else 404)
     catch err
       res.status(500).send(error: err.toString())
 
