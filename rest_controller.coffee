@@ -1,6 +1,7 @@
 util = require 'util'
 _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
+bbCallback = ORMUtils.bbCallback
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
 module.exports = class RESTController
@@ -69,16 +70,14 @@ module.exports = class RESTController
     try
       json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
-      model.save {}, {
-        success: =>
-          json = model.toJSON()
-          json = _.pick(json, @white_lists.create) if @white_lists.create
+      model.save {}, bbCallback (err) =>
+        return res.send(404) if err
 
-          @render req, json, (err, json) =>
-            return res.status(500).send(error: err.toString()) if err
-            res.json(json)
-        error: -> res.send(404)
-      }
+        json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
+        @render req, json, (err, json) =>
+          return res.status(500).send(error: err.toString()) if err
+          res.json(json)
+
     catch err
       res.status(500).send(error: err.toString())
 
@@ -88,16 +87,14 @@ module.exports = class RESTController
       @model_type.find req.params.id, (err, model) =>
         return res.status(500).send(error: err.toString()) if err
         return res.status(404).send() unless model
-        model.save model.parse(json), {
-          success: =>
-            json = model.toJSON()
-            json = _.pick(json, @white_lists.update) if @white_lists.update
+        model.save model.parse(json), bbCallback (err) =>
+          return res.send(404) if err
 
-            @render req, json, (err, json) =>
-              return res.status(500).send(error: err.toString()) if err
-              res.json(json)
-          error: -> res.send(404)
-        }
+          json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
+          @render req, json, (err, json) =>
+            return res.status(500).send(error: err.toString()) if err
+            res.json(json)
+
     catch err
       res.status(500).send(error: err.toString())
 
