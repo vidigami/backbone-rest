@@ -171,7 +171,7 @@ runTests = (options, cache, embed) ->
             assert.ok(!!data = res.body, 'got data')
             assert.equal(data.total_rows, 1, 'has the correct total_rows')
             assert.equal(data.rows.length, 1, 'has the correct row.length')
-            assert.deepEqual(expected = JSON.stringify(model.toJSON()), actual = JSON.stringify(data.rows[0]), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.deepEqual(expected = model.toJSON(), actual = JSONUtils.parse(data.rows[0]), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
 # TODO: explain required set up
