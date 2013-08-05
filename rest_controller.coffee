@@ -71,7 +71,7 @@ module.exports = class RESTController
       json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
       model.save {}, bbCallback (err) =>
-        return res.send(404) if err
+        return res.status(500).send(error: err.toString()) if err
 
         json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
         @render req, json, (err, json) =>
