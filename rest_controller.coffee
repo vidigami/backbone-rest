@@ -3,10 +3,6 @@ _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
-ensureBooleanQuery = (query, key) ->
-  query[key] = true if query.hasOwnProperty(key) and (query[key] is '')
-  return query
-
 module.exports = class RESTController
 
   # TODO: add raw_json vs going through parse and toJSON on the models
@@ -29,8 +25,6 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
-      ensureBooleanQuery(req.query, key) for key in ['$count', '$exists'] # ensure parameters are booleans instead of empty strings
-
       cursor = @model_type.cursor(JSONUtils.parse(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
