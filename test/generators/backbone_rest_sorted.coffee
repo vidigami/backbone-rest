@@ -32,7 +32,7 @@ runTests = (options, cache, embed, callback) ->
 
   describe "RestController (sorted: true, cache: #{cache} embed: #{embed})", ->
 
-    before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
+    before (done) -> return done() unless options.before; options.before([Flat], done)
     after (done) -> callback(); done()
     beforeEach (done) ->
       queue = new Queue(1)
