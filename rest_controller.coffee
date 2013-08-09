@@ -136,7 +136,8 @@ module.exports = class RESTController
       res.status(500).send(error: err.toString())
 
   render: (req, json, callback) ->
-    template_name = req.query.$render or req.query.$template or @default_template
+    query = JSONUtils.parse(req.query)
+    template_name = query.$render or query.$template or @default_template
     return callback(null, json) unless template_name
     return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
 
