@@ -32,10 +32,10 @@ module.exports = class RESTController
         return res.send(404) if err
         return res.json({result: json}) if (cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists'))
         unless json
-          if req.query.$one
+          if cursor.hasCursorQuery('$one')
             return res.status(404).send()
           else
-            res.json(json)
+            return res.json(json)
 
         if cursor.hasCursorQuery('$page')
           @render req, json.rows, (err, rendered_json) =>
@@ -136,8 +136,7 @@ module.exports = class RESTController
       res.status(500).send(error: err.toString())
 
   render: (req, json, callback) ->
-    query = JSONUtils.parse(req.query)
-    template_name = query.$render or query.$template or @default_template
+    template_name = req.query.$render or req.query.$template or @default_template
     return callback(null, json) unless template_name
     return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
 
