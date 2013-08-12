@@ -30,7 +30,7 @@ module.exports = class RESTController
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return res.send(404) if err
-        return res.json({result: json}) if (cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists'))
+        return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
         unless json
           if cursor.hasCursorQuery('$one')
             return res.status(404).send()
