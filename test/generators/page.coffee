@@ -21,7 +21,7 @@ runTests = (options, cache, embed, callback) ->
   SYNC = options.sync
   BASE_COUNT = 5
   MODELS_JSON = null
-  ROUTE = "/test/flats"
+  ROUTE = '/test/flats'
 
   class Flat extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/flats"
@@ -62,7 +62,7 @@ runTests = (options, cache, embed, callback) ->
       request(app)
         .get(ROUTE)
         .query({$page: true, $limit: LIMIT})
-        .set('Accept', 'application/json')
+        .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
@@ -79,7 +79,7 @@ runTests = (options, cache, embed, callback) ->
 
       request(app)
         .get("#{ROUTE}?$page&$limit=#{LIMIT}")
-        .set('Accept', 'application/json')
+        .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
@@ -97,7 +97,7 @@ runTests = (options, cache, embed, callback) ->
       request(app)
         .get(ROUTE)
         .query({$page: false, $limit: LIMIT})
-        .set('Accept', 'application/json')
+        .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
           assert.ok(!!(data = res.body), 'got data')
@@ -113,7 +113,7 @@ runTests = (options, cache, embed, callback) ->
       request(app)
         .get(ROUTE)
         .query({$page: true, $limit: LIMIT, $offset: OFFSET})
-        .set('Accept', 'application/json')
+        .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
@@ -131,7 +131,7 @@ runTests = (options, cache, embed, callback) ->
       request(app)
         .get(ROUTE)
         .query({$page: true, $select: FIELD_NAMES})
-        .set('Accept', 'application/json')
+        .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
@@ -148,7 +148,7 @@ runTests = (options, cache, embed, callback) ->
       request(app)
         .get(ROUTE)
         .query({$page: true, $values: FIELD_NAMES})
-        .set('Accept', 'application/json')
+        .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
           assert.ok(!!data = res.body, 'got data')
@@ -169,7 +169,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$page: true, name: model.get('name')})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "No errors: #{err}")
             assert.ok(!!data = res.body, 'got data')

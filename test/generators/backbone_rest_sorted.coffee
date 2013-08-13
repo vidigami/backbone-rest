@@ -21,7 +21,7 @@ runTests = (options, cache, embed, callback) ->
   SYNC = options.sync
   BASE_COUNT = 5
   MODELS_JSON = null
-  ROUTE = "/test/flats"
+  ROUTE = '/test/flats'
 
   class Flat extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/flats"
@@ -65,7 +65,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -79,7 +79,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name', $select: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -93,7 +93,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $select: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -107,7 +107,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $select: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -121,7 +121,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $select: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -135,7 +135,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $select: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -149,7 +149,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'created_at',  $select: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -163,7 +163,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $select: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -177,7 +177,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -191,7 +191,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: ['name']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -205,7 +205,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -219,7 +219,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: 'name'})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -233,7 +233,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -247,7 +247,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -261,7 +261,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
@@ -275,7 +275,7 @@ runTests = (options, cache, embed, callback) ->
         request(app)
           .get(ROUTE)
           .query({$sort: 'name',  $values: ['name', 'created_at']})
-          .set('Accept', 'application/json')
+          .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")

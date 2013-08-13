@@ -7,4 +7,5 @@ module.exports = (options, callback) ->
   queue.defer (callback) -> require('./backbone_rest')(options, callback)
   queue.defer (callback) -> require('./backbone_rest_sorted')(options, callback)
   queue.defer (callback) -> require('./page')(options, callback)
+  queue.defer (callback) -> require('./join_tables')(options, callback)
   queue.await callback

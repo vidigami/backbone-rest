@@ -3,6 +3,7 @@ _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
 bbCallback = ORMUtils.bbCallback
 JSONUtils = require 'backbone-orm/lib/json_utils'
+JoinTableControllerSingleton = require './lib/join_table_controller_singleton'
 
 module.exports = class RESTController
 
@@ -23,6 +24,8 @@ module.exports = class RESTController
 
     app.head "#{@route}/:id", @_call(@head)
     app.head @route, @_call(@headByQuery)
+
+    JoinTableControllerSingleton.generateByOptions(app, options)
 
   index: (req, res) =>
     try
