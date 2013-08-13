@@ -110,7 +110,7 @@ runTests = (options, cache, embed, callback) ->
               assert.ok(!err, "no errors: #{err}")
               assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
               expected = sortO(_.select(MODELS_JSON, (test) -> test.owner_id is owner_id), 'reverse_id')
-              actual = sortO(_.map(JSONUtils.parse(res.body), (item) -> _.omit(item, 'id')), 'reverse_id')
+              actual = sortO(_.map(JSONUtils.parse(res.body), (item) -> _.pick(item, 'owner_id', 'reverse_id')), 'reverse_id')
               assert.deepEqual(expected, actual, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
 
               reverse_id = actual[0].reverse_id
@@ -122,7 +122,7 @@ runTests = (options, cache, embed, callback) ->
                   assert.ok(!err, "no errors: #{err}")
                   assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                   expected = sortO(_.select(MODELS_JSON, (test) -> test.reverse_id is reverse_id), 'owner_id')
-                  actual = sortO(_.map(JSONUtils.parse(res.body), (item) -> _.omit(item, 'id')), 'owner_id')
+                  actual = sortO(_.map(JSONUtils.parse(res.body), (item) -> _.pick(item, 'owner_id', 'reverse_id')), 'owner_id')
                   assert.deepEqual(expected, actual, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
                   done()
 
