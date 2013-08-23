@@ -6,6 +6,7 @@ Queue = require 'queue-async'
 
 Fabricator = require 'backbone-orm/fabricator'
 JSONUtils = require 'backbone-orm/lib/json_utils'
+Utils = require 'backbone-orm/lib/utils'
 
 request = require 'supertest'
 express = require 'express'
@@ -37,7 +38,7 @@ runTests = (options, cache, embed, callback) ->
     beforeEach (done) ->
       queue = new Queue(1)
 
-      queue.defer (callback) -> Flat.destroy callback
+      queue.defer (callback) -> Utils.resetSchemas [Flat], callback
 
       queue.defer (callback) -> Fabricator.create(Flat, BASE_COUNT, {
         name: Fabricator.uniqueId('flat_')
