@@ -322,7 +322,7 @@ runTests = (options, cache, embed, callback) ->
         app = express(); app.use(express.bodyParser())
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
-        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
+        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: (new Date).toISOString()}
         request(app)
           .post(ROUTE)
           .send(attributes)
@@ -337,7 +337,7 @@ runTests = (options, cache, embed, callback) ->
         app = express(); app.use(express.bodyParser())
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {create: ['id', 'name', 'updated_at']}})
 
-        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: Math.floor(Math.random()*10)}
+        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: (new Date).toISOString()}
         request(app)
           .post(ROUTE)
           .send(attributes)
