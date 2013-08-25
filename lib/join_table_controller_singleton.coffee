@@ -18,7 +18,7 @@ class JoinTableControllerSingleton
     route_root = route_parts.join('/')
 
     schema = options.model_type.schema()
-    for name, relation of schema.relations
+    for key, relation of schema.relations
       continue unless (relation and relation.join_table)
       try
         join_table_url = _.result(relation.join_table.prototype, 'url')
