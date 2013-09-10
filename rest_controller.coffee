@@ -142,14 +142,19 @@ module.exports = class RESTController
     catch err
       sendError(res, err)
 
-  render: (req, json, callback) ->
-    template_name = req.query.$render or req.query.$template or @default_template
-    return callback(null, json) unless template_name
-    return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
+  preRender: (req, json, callback) -> callback()
 
-    options = (if @renderOptions then @renderOptions(req, template_name) else {})
-    models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
-    JSONUtils.renderTemplate models, template, options, callback
+  render: (req, json, callback) ->
+    @preRender req, json, (err) =>
+      return callback(err) if err
+
+      template_name = req.query.$render or req.query.$template or @default_template
+      return callback(null, json) unless template_name
+      return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
+
+      options = (if @renderOptions then @renderOptions(req, template_name) else {})
+      models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
+      JSONUtils.renderTemplate models, template, options, callback
 
   _call: (fn) =>
     auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
