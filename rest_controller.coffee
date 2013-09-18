@@ -151,7 +151,12 @@ module.exports = class RESTController
     models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
     JSONUtils.renderTemplate models, template, options, callback
 
+  setHeaders: (req, res, next) =>
+    res.header('Cache-Control', 'no-cache')
+    next()
+
   _call: (fn) =>
     auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
+    auths.push(@setHeaders)
     auths.push(fn)
     return auths
