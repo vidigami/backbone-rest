@@ -157,7 +157,7 @@ module.exports = class RESTController
       JSONUtils.renderTemplate models, template, options, callback
 
   setHeaders: (req, res, next) ->
-    res.header('Cache-Control', 'no-cache')
+    res.header('cache-control', 'no-cache')
     next()
 
   _call: (fn) =>
