@@ -142,16 +142,21 @@ module.exports = class RESTController
     catch err
       sendError(res, err)
 
+  preRender: (req, json, callback) -> callback()
+
   render: (req, json, callback) ->
-    template_name = req.query.$render or req.query.$template or @default_template
-    return callback(null, json) unless template_name
-    return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
+    @preRender req, json, (err) =>
+      return callback(err) if err
 
-    options = (if @renderOptions then @renderOptions(req, template_name) else {})
-    models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
-    JSONUtils.renderTemplate models, template, options, callback
+      template_name = req.query.$render or req.query.$template or @default_template
+      return callback(null, json) unless template_name
+      return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
 
-  setHeaders: (req, res, next) =>
+      options = (if @renderOptions then @renderOptions(req, template_name) else {})
+      models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
+      JSONUtils.renderTemplate models, template, options, callback
+
+  setHeaders: (req, res, next) ->
     res.header('Cache-Control', 'no-cache')
     next()
 
