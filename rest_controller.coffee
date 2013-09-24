@@ -14,6 +14,8 @@ module.exports = class RESTController
     @templates or= {}
     @logger or= console
 
+    @route = "#{@route_prefix}#{@route}" if @route_prefix
+
     app.get "#{@route}/:id", @_call(@show)
     app.get @route, @_call(@index)
 
