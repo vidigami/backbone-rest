@@ -1,4 +1,3 @@
-util = require 'util'
 _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
 bbCallback = ORMUtils.bbCallback

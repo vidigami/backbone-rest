@@ -2,7 +2,7 @@ util = require 'util'
 assert = require 'assert'
 _ = require 'underscore'
 Backbone = require 'backbone'
-Queue = require 'queue-async'
+Queue = require 'backbone-orm/lib/queue'
 
 Fabricator = require 'backbone-orm/test/fabricator'
 JSONUtils = require 'backbone-orm/lib/json_utils'

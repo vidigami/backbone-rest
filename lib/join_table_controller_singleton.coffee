@@ -1,4 +1,3 @@
-util = require 'util'
 path = require 'path'
 _ = require 'underscore'
 RestController = null
