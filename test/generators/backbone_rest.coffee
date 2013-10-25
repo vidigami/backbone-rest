@@ -19,7 +19,7 @@ RestController = require '../../rest_controller'
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
-runTests = (options, cache, embed, callback) ->
+module.exports = (options, callback) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
@@ -32,9 +32,9 @@ runTests = (options, cache, embed, callback) ->
     @schema: _.defaults({
       boolean: 'Boolean'
     }, BASE_SCHEMA)
-    sync: SYNC(Flat, cache)
+    sync: SYNC(Flat, options.cache)
 
-  describe "RestController (sorted: false, cache: #{cache} embed: #{embed})", ->
+  describe "RestController (sorted: false, cache: #{options.cache} embed: #{options.embed})", ->
 
     before (done) -> return done() unless options.before; options.before([Flat], done)
     after (done) -> callback(); done()
@@ -536,15 +536,3 @@ runTests = (options, cache, embed, callback) ->
                     assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                     assert.ok(!res.body.result, "No longer exists by name. Body: #{util.inspect(res.body)}")
                     done()
-
-# TODO: explain required set up
-
-# each model should have available attribute 'id', 'name', 'created_at', 'updated_at', etc....
-# beforeEach should return the models_json for the current run
-module.exports = (options, callback) ->
-  queue = new Queue(1)
-  queue.defer (callback) -> runTests(options, false, false, callback)
-  queue.defer (callback) -> runTests(options, true, false, callback)
-  not options.embed or queue.defer (callback) -> runTests(options, false, true, callback)
-  not options.embed or queue.defer (callback) -> runTests(options, true, true, callback)
-  queue.await callback
