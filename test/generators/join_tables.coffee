@@ -4,12 +4,15 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 Queue = require 'queue-async'
 
-Fabricator = require 'backbone-orm/fabricator'
+Fabricator = require 'backbone-orm/test/fabricator'
 Utils = require 'backbone-orm/lib/utils'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
 request = require 'supertest'
 express = require 'express'
+
+ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
+QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
 
 RestController = require '../../rest_controller'
 
@@ -24,7 +27,8 @@ runTests = (options, cache, embed, callback) ->
   MODELS_JSON = null
   OWNER_ROUTE = '/test/owners'
   JOIN_TABLE_ROUTE = '/test/owners_reverses'
-  # require('backbone-orm/lib/cache').configure(if cache then {max: 100} else null) # configure caching
+
+  ModelCache.configure(if options.cache then {max: 100} else null).hardReset() # configure model cache
 
   class Reverse extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/reverses"
@@ -50,11 +54,14 @@ runTests = (options, cache, embed, callback) ->
     before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
     after (done) -> callback(); done()
     beforeEach (done) ->
-      require('backbone-orm/lib/cache').reset() # reset cache
       require('../../lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)
+
+      # reset caches
+      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure query cache
+      queue.defer (callback) -> QueryCache.configure({enabled: !!options.query_cache, verbose: false}).reset(callback) # configure query cache
 
       # destroy all
       queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback

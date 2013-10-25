@@ -4,12 +4,15 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 Queue = require 'queue-async'
 
-Fabricator = require 'backbone-orm/fabricator'
+Fabricator = require 'backbone-orm/test/fabricator'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 Utils = require 'backbone-orm/lib/utils'
 
 request = require 'supertest'
 express = require 'express'
+
+ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
+QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
 
 RestController = require '../../rest_controller'
 
@@ -37,6 +40,10 @@ runTests = (options, cache, embed, callback) ->
     after (done) -> callback(); done()
     beforeEach (done) ->
       queue = new Queue(1)
+
+      # reset caches
+      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure query cache
+      queue.defer (callback) -> QueryCache.configure({enabled: !!options.query_cache, verbose: false}).reset(callback) # configure query cache
 
       queue.defer (callback) -> Utils.resetSchemas [Flat], callback
 

@@ -1,5 +1,7 @@
+_ = require 'underscore'
+
 module.exports = (options, callback) ->
-  test_parameters =
+  test_parameters = _.extend options,
     database_url: '/test'
     schema:
       name: ['String', indexed: true]
