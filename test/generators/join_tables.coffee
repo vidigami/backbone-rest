@@ -54,7 +54,7 @@ module.exports = (options, callback) ->
     before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
     after (done) -> callback(); done()
     beforeEach (done) ->
-      require('../../lib/join_table_controller_singleton').reset() # reset join tables
+      require('../../src/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)
