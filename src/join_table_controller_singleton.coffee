@@ -10,7 +10,7 @@ class JoinTableControllerSingleton
     @join_tables = {}
 
   generateByOptions: (app, options) ->
-    RestController = require '../rest_controller' unless RestController # dependency cycle
+    RestController = require './rest_controller' unless RestController # dependency cycle
 
     route_parts = options.route.split('/')
     route_parts.pop()

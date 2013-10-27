@@ -2,7 +2,7 @@ _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
 bbCallback = ORMUtils.bbCallback
 JSONUtils = require 'backbone-orm/lib/json_utils'
-JoinTableControllerSingleton = require './lib/join_table_controller_singleton'
+JoinTableControllerSingleton = require './join_table_controller_singleton'
 
 module.exports = class RESTController
 

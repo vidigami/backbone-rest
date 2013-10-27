@@ -14,7 +14,7 @@ express = require 'express'
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
 
-RestController = require '../../rest_controller'
+RestController = require '../../src/rest_controller'
 
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))

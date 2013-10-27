@@ -7,7 +7,7 @@ module.exports = (options, callback) ->
       name: ['String', indexed: true]
       created_at: 'DateTime'
       updated_at: 'DateTime'
-    sync: require('backbone-orm/memory_sync')
+    sync: require('backbone-orm/lib/memory/sync')
     embed: true
 
   require('../generators/all')(test_parameters, callback)
