@@ -4,4 +4,4 @@
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
-module.exports = require './lib/rest_controller'
+module.exports = require './rest_controller'
