@@ -1,3 +1,9 @@
+###
+  backbone-rest.js 0.0.1
+  Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-rest
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+###
+
 _ = require 'underscore'
 ORMUtils = require 'backbone-orm/lib/utils'
 bbCallback = ORMUtils.bbCallback
