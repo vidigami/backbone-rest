@@ -7,7 +7,6 @@
 _ = require 'underscore'
 Backbone = require 'backbone'
 ORMUtils = require 'backbone-orm/lib/utils'
-bbCallback = ORMUtils.bbCallback
 JSONUtils = require 'backbone-orm/lib/json_utils'
 JoinTableControllerSingleton = require './join_table_controller_singleton'
 
@@ -95,12 +94,13 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:create', event_data)
-
       json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
-      model.save {}, bbCallback (err) =>
+
+      event_data = {req: res, res: res, model: model}
+      @constructor.trigger('pre:create', event_data)
+
+      model.save (err) =>
         return @sendError(res, err) if err
 
         event_data.model = model
@@ -115,14 +115,16 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:update', event_data)
-
       json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
+
       @model_type.find req.params.id, (err, model) =>
         return @sendError(res, err) if err
         return res.status(404).send() unless model
-        model.save model.parse(json), bbCallback (err) =>
+
+        event_data = {req: res, res: res, model: model}
+        @constructor.trigger('pre:update', event_data)
+
+        model.save model.parse(json), (err) =>
           return @sendError(res, err) if err
 
           event_data.model = model
