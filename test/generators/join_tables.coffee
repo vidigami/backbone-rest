@@ -91,7 +91,7 @@ module.exports = (options, callback) ->
           do (owner) -> save_queue.defer (callback) ->
             owner.set({reverses: [MODELS.reverse.pop(), MODELS.reverse.pop()]})
             MODELS_JSON.push({owner_id: owner.id, reverse_id: reverse.id}) for reverse in owner.get('reverses').models # save relations
-            owner.save {}, Utils.bbCallback callback
+            owner.save callback
 
         save_queue.await callback
 
@@ -183,7 +183,7 @@ module.exports = (options, callback) ->
     #       assert.ok(!err, "No errors: #{err}")
     #       assert.ok(reverses, 'found model')
 
-    #       owner.destroy Utils.bbCallback (err, owner) ->
+    #       owner.destroy (err, owner) ->
     #         assert.ok(!err, "No errors: #{err}")
 
     #         Owner.relation('reverses').join_table.find {owner_id: owner.id}, (err, null_reverses) ->
@@ -199,7 +199,7 @@ module.exports = (options, callback) ->
     #       assert.ok(!err, "No errors: #{err}")
     #       assert.ok(reverses, 'found model')
 
-    #       owner.destroy Utils.bbCallback (err, owner) ->
+    #       owner.destroy (err, owner) ->
     #         assert.ok(!err, "No errors: #{err}")
 
     #         Owner.relation('reverses').join_table.find {owner_id: owner.id}, (err, null_reverses) ->
