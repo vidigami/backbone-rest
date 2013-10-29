@@ -14,7 +14,7 @@ express = require 'express'
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
 
-RestController = require '../../src/rest_controller'
+RestController = require '../../lib/rest_controller'
 
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
@@ -54,7 +54,7 @@ module.exports = (options, callback) ->
     before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
     after (done) -> callback(); done()
     beforeEach (done) ->
-      require('../../src/join_table_controller_singleton').reset() # reset join tables
+      require('../../lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)
