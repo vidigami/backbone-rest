@@ -656,25 +656,3 @@ module.exports = (options, callback) ->
                     assert.ok(!res.body.result, "No longer exists by name. Body: #{util.inspect(res.body)}")
                     done()
 
-      it 'should trigger pre:head and post:head events on head', (done) ->
-        app = express(); app.use(express.bodyParser())
-
-        class EventController extends RestController
-          constructor: ->
-            super(app, {model_type: Flat, route: ROUTE})
-        controller = new EventController()
-
-        pre_triggered = false
-        post_triggered = false
-        EventController.on 'pre:head', (req) -> pre_triggered = true if req
-        EventController.on 'post:head', (json) -> post_triggered = true if json
-
-        id = MODELS_JSON[1].id
-        request(app)
-        .head("#{ROUTE}/#{id}")
-        .end (err, res) ->
-            assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
-            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
-            done()

@@ -165,11 +165,8 @@ module.exports = class RESTController
 
   head: (req, res) =>
     try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:head', event_data)
       @model_type.exists req.params.id, (err, exists) =>
         return @sendError(res, err) if err
-        @constructor.trigger('post:head', event_data)
         res.send(if exists then 200 else 404)
     catch err
       @sendError(res, err)
