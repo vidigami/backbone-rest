@@ -5,6 +5,7 @@
 ###
 
 _ = require 'underscore'
+Backbone = require 'backbone'
 ORMUtils = require 'backbone-orm/lib/utils'
 bbCallback = ORMUtils.bbCallback
 JSONUtils = require 'backbone-orm/lib/json_utils'
@@ -41,10 +42,12 @@ module.exports = class RESTController
 
   index: (req, res) =>
     try
+      @constructor.trigger('pre:index', req)
       cursor = @model_type.cursor(JSONUtils.parse(req.query))
       cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
       cursor.toJSON (err, json) =>
         return @sendError(res, err) if err
+        @constructor.trigger('post:index', json)
         return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
         unless json
           if cursor.hasCursorQuery('$one')
@@ -67,6 +70,7 @@ module.exports = class RESTController
 
   show: (req, res) =>
     try
+      @constructor.trigger('pre:show', req)
       cursor = @model_type.cursor(req.params.id)
       cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
       cursor.toJSON (err, json) =>
@@ -74,6 +78,7 @@ module.exports = class RESTController
         return res.status(404).send() unless json
         json = _.pick(json, @white_lists.show) if @white_lists.show
 
+        @constructor.trigger('post:show', json)
         @render req, json, (err, json) =>
           return @sendError(res, err) if err
           res.json(json)
@@ -83,12 +88,14 @@ module.exports = class RESTController
 
   create: (req, res) =>
     try
+      @constructor.trigger('pre:create', req)
       json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
       model = new @model_type(@model_type::parse(json))
       model.save {}, bbCallback (err) =>
         return @sendError(res, err) if err
 
         json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
+        @constructor.trigger('post:create', json)
         @render req, json, (err, json) =>
           return @sendError(res, err) if err
           res.json(json)
@@ -98,6 +105,7 @@ module.exports = class RESTController
 
   update: (req, res) =>
     try
+      @constructor.trigger('pre:update', req)
       json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
       @model_type.find req.params.id, (err, model) =>
         return @sendError(res, err) if err
@@ -106,6 +114,7 @@ module.exports = class RESTController
           return @sendError(res, err) if err
 
           json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
+          @constructor.trigger('post:update', json)
           @render req, json, (err, json) =>
             return @sendError(res, err) if err
             res.json(json)
@@ -115,12 +124,14 @@ module.exports = class RESTController
 
   destroy: (req, res) =>
     try
+      @constructor.trigger('pre:destroy', req)
       @model_type.exists req.params.id, (err, exists) =>
         return @sendError(res, err) if err
         return res.status(404).send() unless exists
 
-        @model_type.destroy {id: req.params.id}, (err) ->
+        @model_type.destroy {id: req.params.id}, (err) =>
           return @sendError(res, err) if err
+          @constructor.trigger('post:destroy', req.params.id)
           res.status(200).send()
 
     catch err
@@ -128,24 +139,30 @@ module.exports = class RESTController
 
   destroyByQuery: (req, res) =>
     try
+      @constructor.trigger('pre:destroyByQuery', req)
       @model_type.destroy JSONUtils.parse(req.query), (err) =>
         return @sendError(res, err) if err
+        @constructor.trigger('post:destroyByQuery', req.params.id)
         res.send(200)
     catch err
       @sendError(res, err)
 
   head: (req, res) =>
     try
+      @constructor.trigger('pre:head', req)
       @model_type.exists req.params.id, (err, exists) =>
         return @sendError(res, err) if err
+        @constructor.trigger('post:head')
         res.send(if exists then 200 else 404)
     catch err
       @sendError(res, err)
 
   headByQuery: (req, res) =>
     try
+      @constructor.trigger('pre:headByQuery', req)
       @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
         return @sendError(res, err) if err
+        @constructor.trigger('post:headByQuery')
         res.send(if exists then 200 else 404)
     catch err
       @sendError(res, err)
@@ -173,3 +190,5 @@ module.exports = class RESTController
     auths.push(@setHeaders)
     auths.push(fn)
     return auths
+
+_.extend(RESTController, Backbone.Events)

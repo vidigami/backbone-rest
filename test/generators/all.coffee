@@ -5,7 +5,7 @@ Queue = require 'backbone-orm/lib/queue'
 module.exports = (options, callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> require('./backbone_rest')(options, callback)
-  queue.defer (callback) -> require('./backbone_rest_sorted')(options, callback)
-  queue.defer (callback) -> require('./page')(options, callback)
-  queue.defer (callback) -> require('./join_tables')(options, callback)
+#  queue.defer (callback) -> require('./backbone_rest_sorted')(options, callback)
+#  queue.defer (callback) -> require('./page')(options, callback)
+#  queue.defer (callback) -> require('./join_tables')(options, callback)
   queue.await callback

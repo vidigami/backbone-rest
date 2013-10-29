@@ -66,6 +66,7 @@ module.exports = (options, callback) ->
     ######################################
 
     describe 'index', ->
+
       it 'should return json for all models with no query', (done) ->
         app = express(); app.use(express.bodyParser())
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
@@ -289,6 +290,29 @@ module.exports = (options, callback) ->
             assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> [])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
+      it 'should trigger pre:index and post:index events on index', (done) ->
+        app = express(); app.use(express.bodyParser())
+
+        class EventController extends RestController
+          constructor: ->
+            super(app, {model_type: Flat, route: ROUTE})
+        controller = new EventController()
+
+        pre_triggered = false
+        post_triggered = false
+        EventController.on 'pre:index', (req) -> pre_triggered = true if req
+        EventController.on 'post:index', (json) -> post_triggered = true if json
+
+        request(app)
+        .get(ROUTE)
+        .type('json')
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
+            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
+            done()
+
     ######################################
     # show
     ######################################
@@ -319,6 +343,29 @@ module.exports = (options, callback) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
             assert.deepEqual(expected = _.pick(attributes, ['id', 'name', 'created_at']), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            done()
+
+      it 'should trigger pre:show and post:show events on show', (done) ->
+        app = express(); app.use(express.bodyParser())
+
+        class EventController extends RestController
+          constructor: ->
+            super(app, {model_type: Flat, route: ROUTE})
+        controller = new EventController()
+
+        pre_triggered = false
+        post_triggered = false
+        EventController.on 'pre:show', (req) -> pre_triggered = true if req
+        EventController.on 'post:show', (json) -> post_triggered = true if json
+
+        request(app)
+        .get("#{ROUTE}/#{MODELS_JSON[0].id}")
+        .type('json')
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
+            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
             done()
 
     ######################################
@@ -358,6 +405,30 @@ module.exports = (options, callback) ->
             assert.ok(!res.body.created_at, 'created_at was not returned')
             done()
 
+      it 'should trigger pre:create and post:create events on create', (done) ->
+        app = express(); app.use(express.bodyParser())
+
+        class EventController extends RestController
+          constructor: ->
+            super(app, {model_type: Flat, route: ROUTE})
+        controller = new EventController()
+
+        pre_triggered = false
+        post_triggered = false
+        EventController.on 'pre:create', (req) -> pre_triggered = true if req
+        EventController.on 'post:create', (json) -> post_triggered = true if json
+
+        attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: (new Date).toISOString()}
+        request(app)
+        .post(ROUTE)
+        .send(attributes)
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
+            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
+            done()
+
     ######################################
     # update
     ######################################
@@ -393,6 +464,31 @@ module.exports = (options, callback) ->
             assert.deepEqual(_.pick(attributes, ['id', 'name', 'updated_at']), JSONUtils.parse(res.body), 'model was updated')
             done()
 
+      it 'should trigger pre:update and post:create events on update', (done) ->
+        app = express(); app.use(express.bodyParser())
+
+        class EventController extends RestController
+          constructor: ->
+            super(app, {model_type: Flat, route: ROUTE})
+        controller = new EventController()
+
+        pre_triggered = false
+        post_triggered = false
+        EventController.on 'pre:update', (req) -> pre_triggered = true if req
+        EventController.on 'post:update', (json) -> post_triggered = true if json
+
+        attributes = _.clone(MODELS_JSON[1])
+        attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"
+        request(app)
+        .put("#{ROUTE}/#{attributes.id}")
+        .send(attributes)
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
+            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
+            done()
+
     ######################################
     # delete
     ######################################
@@ -415,6 +511,29 @@ module.exports = (options, callback) ->
                 assert.ok(!err, "no errors: #{err}")
                 assert.equal(res.status, 404, "status 404 on subsequent request. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                 done()
+
+      it 'should trigger pre:destroy and post:destroy events on destroy', (done) ->
+        app = express(); app.use(express.bodyParser())
+
+        class EventController extends RestController
+          constructor: ->
+            super(app, {model_type: Flat, route: ROUTE})
+        controller = new EventController()
+
+        pre_triggered = false
+        post_triggered = false
+        EventController.on 'pre:destroy', (req) -> pre_triggered = true if req
+        EventController.on 'post:destroy', (json) -> post_triggered = true if json
+
+        id = MODELS_JSON[1].id
+        request(app)
+        .del("#{ROUTE}/#{id}")
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
+            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
+            done()
 
     ######################################
     # head
@@ -536,3 +655,26 @@ module.exports = (options, callback) ->
                     assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                     assert.ok(!res.body.result, "No longer exists by name. Body: #{util.inspect(res.body)}")
                     done()
+
+      it 'should trigger pre:head and post:head events on head', (done) ->
+        app = express(); app.use(express.bodyParser())
+
+        class EventController extends RestController
+          constructor: ->
+            super(app, {model_type: Flat, route: ROUTE})
+        controller = new EventController()
+
+        pre_triggered = false
+        post_triggered = false
+        EventController.on 'pre:head', (req) -> pre_triggered = true if req
+        EventController.on 'post:head', (json) -> post_triggered = true if json
+
+        id = MODELS_JSON[1].id
+        request(app)
+        .head("#{ROUTE}/#{id}")
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.ok(pre_triggered, "Pre event trigger: #{pre_triggered}")
+            assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
+            done()
