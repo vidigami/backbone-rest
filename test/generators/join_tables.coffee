@@ -28,7 +28,7 @@ module.exports = (options, callback) ->
   OWNER_ROUTE = '/test/owners'
   JOIN_TABLE_ROUTE = '/test/owners_reverses'
 
-  ModelCache.configure(if options.cache then {max: 100} else null).hardReset() # configure model cache
+  ModelCache.configure({enabled: !!options.cache, max: 100}).hardReset() # configure model cache
 
   class Reverse extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/reverses"
