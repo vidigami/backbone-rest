@@ -30,6 +30,6 @@
   "dependencies": {
     "underscore": "1.5.x",
     "backbone": "1.1.x",
-    "backbone-orm": "0.5.0"
+    "backbone-orm": "0.5.x"
   }
 }
