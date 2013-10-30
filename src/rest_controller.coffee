@@ -50,7 +50,7 @@ module.exports = class RESTController
       cursor.toJSON (err, json) =>
         return @sendError(res, err) if err
 
-        @constructor.trigger('post:show', _.extend(event_data, {json: json}))
+        @constructor.trigger('post:index', _.extend(event_data, {json: json}))
 
         return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
         unless json
