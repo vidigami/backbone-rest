@@ -2,9 +2,37 @@
 
 ![logo](https://github.com/vidigami/backbone-rest/raw/master/media/logo.png)
 
-A RESTful controller for BackboneORM.
+By using BackboneREST on the server and BackboneORM's JSON rendering DSL, you can save time in defining JSON APIs.
 
-Please [checkout the website](http://vidigami.github.io/backbone-orm/) for examples, documentation, and community!
+#### Examples (CoffeeScript)
+
+```
+Backbone = require 'backbone'
+RestController = require 'backbone-rest'
+
+class Task extends Backbone.Model
+  urlRoot: 'mongodb://localhost:27017/tasks'
+  sync: require('backbone-mongo').sync(Task)
+
+new RestController(app, {model_type: Task, route: '/tasks'})
+```
+
+#### Examples (JavaScript)
+
+```
+var Backbone = require('backbone');
+var RestController = require('backbone-rest');
+
+var Task = Backbone.Model.extend({
+  urlRoot: 'mongodb://localhost:27017/tasks'
+});
+Task.prototype.sync = require('backbone-mongo').sync(Task);
+
+new RestController(app, {model_type: Task, route: '/tasks'});
+```
+
+
+Please [checkout the website](http://vidigami.github.io/backbone-orm/backbone-rest.html) for installation instructions, examples, documentation, and community!
 
 
 ### For Contributors
