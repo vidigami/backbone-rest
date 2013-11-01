@@ -9,12 +9,18 @@ By using BackboneREST on the server and BackboneORM's JSON rendering DSL, you ca
 ```
 Backbone = require 'backbone'
 RestController = require 'backbone-rest'
+ensureLoggedIn = require 'connect-ensure-login'
 
-class Task extends Backbone.Model
-  urlRoot: 'mongodb://localhost:27017/tasks'
-  sync: require('backbone-mongo').sync(Task)
+customAuthorization = (req, res, next) ->
+  unless req.user.canAccessTask(req)
+    return res.status(401).send('you cannot access this task')
+  next()
 
-new RestController(app, {model_type: Task, route: '/tasks'})
+new RestController(app, {
+  auth: [ensureLoggedIn('/login'), customAuthorization]
+  model_type: Task
+  route: '/tasks'
+})
 ```
 
 #### Examples (JavaScript)
@@ -22,13 +28,20 @@ new RestController(app, {model_type: Task, route: '/tasks'})
 ```
 var Backbone = require('backbone');
 var RestController = require('backbone-rest');
+var ensureLoggedIn = require('connect-ensure-login');
 
-var Task = Backbone.Model.extend({
-  urlRoot: 'mongodb://localhost:27017/tasks'
+var customAuthorization = function(req, res, next) {
+  if (!req.user.canAccessTask(req)) {
+    return res.status(401).send('you cannot access this task');
+  }
+  return next();
+};
+
+new RestController(app, {
+  auth: [ensureLoggedIn('/login'), customAuthorization],
+  model_type: Task,
+  route: '/tasks'
 });
-Task.prototype.sync = require('backbone-mongo').sync(Task);
-
-new RestController(app, {model_type: Task, route: '/tasks'});
 ```
 
 
