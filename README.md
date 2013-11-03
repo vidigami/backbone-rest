@@ -6,7 +6,7 @@ By using BackboneREST on the server and BackboneORM's JSON rendering DSL, you ca
 
 #### Examples (CoffeeScript)
 
-```
+```coffeescript
 Backbone = require 'backbone'
 RestController = require 'backbone-rest'
 ensureLoggedIn = require 'connect-ensure-login'
@@ -25,7 +25,7 @@ new RestController(app, {
 
 #### Examples (JavaScript)
 
-```
+```javascript
 var Backbone = require('backbone');
 var RestController = require('backbone-rest');
 var ensureLoggedIn = require('connect-ensure-login');
@@ -52,8 +52,12 @@ Please [checkout the website](http://vidigami.github.io/backbone-orm/backbone-re
 
 To build the library for Node.js:
 
-  $ npm run build
+```
+$ npm run
+```
 
 Please run tests before submitting a pull request.
 
-  $ npm test
+```
+$ npm test
+```
