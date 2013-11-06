@@ -6,7 +6,7 @@
 
 path = require 'path'
 _ = require 'underscore'
-RestController = null
+JoinTableController = null
 
 class JoinTableControllerSingleton
   constructor: ->
@@ -16,7 +16,7 @@ class JoinTableControllerSingleton
     @join_tables = {}
 
   generateByOptions: (app, options) ->
-    RestController = require './rest_controller' unless RestController # dependency cycle
+    JoinTableController = require './join_table_controller' unless JoinTableController # dependency cycle
 
     route_parts = options.route.split('/')
     route_parts.pop()
@@ -39,6 +39,6 @@ class JoinTableControllerSingleton
       delete join_table_options[key] for key in ['white_lists', 'templates', 'default_template']
       join_table_options.model_type = relation.join_table
       # console.log "Generating join table controller at #{join_table_options.route}"
-      @join_tables[join_table_options.route] = new RestController(app, join_table_options)
+      @join_tables[join_table_options.route] = new JoinTableController(app, join_table_options)
 
 module.exports = new JoinTableControllerSingleton()
