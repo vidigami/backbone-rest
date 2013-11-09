@@ -192,6 +192,20 @@ module.exports = (options, callback) ->
             assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
             done()
 
+      it 'should select requested values by single key (when a template is present)', (done) ->
+        app = express(); app.use(express.bodyParser())
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, templates: {show: {$select: ['name']}}, default_template: 'show'})
+
+        request(app)
+        .get(ROUTE)
+        .query({$values: 'name'})
+        .type('json')
+        .end (err, res) ->
+            assert.ok(!err, "no errors: #{err}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = sortA(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            done()
+
       it 'should select requested values by single key (in array)', (done) ->
         app = express(); app.use(express.bodyParser())
         controller = new RestController(app, {model_type: Flat, route: ROUTE})

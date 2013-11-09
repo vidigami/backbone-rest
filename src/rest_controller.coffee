@@ -64,6 +64,8 @@ module.exports = class RESTController
             return @sendError(res, err) if err
             json.rows = rendered_json
             res.json(json)
+        else if cursor.hasCursorQuery('$values')
+          res.json(json)
         else
           @render req, json, (err, rendered_json) =>
             return @sendError(res, err) if err
