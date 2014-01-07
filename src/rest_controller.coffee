@@ -167,12 +167,18 @@ module.exports = class RESTController
     next()
 
   _reqToCRUD: (req) ->
-    switch (req.method)
-      when 'GET' then return (if req.params.id then 'show' else 'index')
-      when 'POST' then return 'create'
-      when 'PUT' then return 'update'
-      when 'DELETE' then return (if req.params.id then 'destroy' else 'destroyByQuery')
-      when 'HEAD' then return (if req.params.id then 'head' else 'headByQuery')
+    if req.path is @route
+      switch req.method
+        when 'GET' then return 'index'
+        when 'POST' then return 'create'
+        when 'DELETE' then return 'destroyByQuery'
+        when 'HEAD' then return 'headByQuery'
+    else if req.params.id and req.path is "#{@route}/#{req.params.id}"
+      switch req.method
+        when 'GET' then  return 'show'
+        when 'PUT' then return 'update'
+        when 'DELETE' then return 'destroy'
+        when 'HEAD' then return 'head'
 
   _call: (fn) =>
     auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
