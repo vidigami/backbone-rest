@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.5.3
+* Automatically wrap _call in try/catch
+* Added blocked array to disable routes
+
 ### 0.5.2
 * Fixed $values in index when a template is present
 

@@ -1,5 +1,5 @@
 ###
-  backbone-rest.js 0.5.2
+  backbone-rest.js 0.5.3
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-rest
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
@@ -14,9 +14,8 @@ module.exports = class RESTController
 
   # TODO: add raw_json vs going through parse and toJSON on the models
   constructor: (app, options={}) ->
-    @[key] = value for key, value of options
-    @white_lists or= {}
-    @templates or= {}
+    _.extend(@, options)
+    @white_lists or= {}; @templates or= {}
     @logger or= console
 
     @route = "#{@route_prefix}#{@route}" if @route_prefix
@@ -42,146 +41,117 @@ module.exports = class RESTController
     res.header('content-type', 'text/plain').status(500).send(err.toString())
 
   index: (req, res) =>
-    try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:index', event_data)
-      cursor = @model_type.cursor(JSONUtils.parse(req.query))
-      cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
-      cursor.toJSON (err, json) =>
-        return @sendError(res, err) if err
+    event_data = {req: res, res: res}
+    @constructor.trigger('pre:index', event_data)
+    cursor = @model_type.cursor(JSONUtils.parse(req.query))
+    cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
+    cursor.toJSON (err, json) =>
+      return @sendError(res, err) if err
 
-        @constructor.trigger('post:index', _.extend(event_data, {json: json}))
+      @constructor.trigger('post:index', _.extend(event_data, {json: json}))
 
-        return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
-        unless json
-          if cursor.hasCursorQuery('$one')
-            return res.status(404).send()
-          else
-            return res.json(json)
-
-        if cursor.hasCursorQuery('$page')
-          @render req, json.rows, (err, rendered_json) =>
-            return @sendError(res, err) if err
-            json.rows = rendered_json
-            res.json(json)
-        else if cursor.hasCursorQuery('$values')
-          res.json(json)
+      return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
+      unless json
+        if cursor.hasCursorQuery('$one')
+          return res.status(404).send()
         else
-          @render req, json, (err, rendered_json) =>
-            return @sendError(res, err) if err
-            res.json(rendered_json)
+          return res.json(json)
 
-    catch err
-      @sendError(res, err)
+      if cursor.hasCursorQuery('$page')
+        @render req, json.rows, (err, rendered_json) =>
+          return @sendError(res, err) if err
+          json.rows = rendered_json
+          res.json(json)
+      else if cursor.hasCursorQuery('$values')
+        res.json(json)
+      else
+        @render req, json, (err, rendered_json) =>
+          return @sendError(res, err) if err
+          res.json(rendered_json)
 
   show: (req, res) =>
-    try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:show', event_data)
+    event_data = {req: res, res: res}
+    @constructor.trigger('pre:show', event_data)
 
-      cursor = @model_type.cursor(req.params.id)
-      cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
-      cursor.toJSON (err, json) =>
+    cursor = @model_type.cursor(req.params.id)
+    cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
+    cursor.toJSON (err, json) =>
+      return @sendError(res, err) if err
+      return res.status(404).send() unless json
+      json = _.pick(json, @white_lists.show) if @white_lists.show
+
+      @constructor.trigger('post:show', _.extend(event_data, {json: json}))
+      @render req, json, (err, json) =>
         return @sendError(res, err) if err
-        return res.status(404).send() unless json
-        json = _.pick(json, @white_lists.show) if @white_lists.show
-
-        @constructor.trigger('post:show', _.extend(event_data, {json: json}))
-        @render req, json, (err, json) =>
-          return @sendError(res, err) if err
-          res.json(json)
-
-    catch err
-      @sendError(res, err)
+        res.json(json)
 
   create: (req, res) =>
-    try
-      json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
-      model = new @model_type(@model_type::parse(json))
+    json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
+    model = new @model_type(@model_type::parse(json))
+
+    event_data = {req: res, res: res, model: model}
+    @constructor.trigger('pre:create', event_data)
+
+    model.save (err) =>
+      return @sendError(res, err) if err
+
+      event_data.model = model
+      json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
+      @render req, json, (err, json) =>
+        return @sendError(res, err) if err
+        @constructor.trigger('post:create', _.extend(event_data, {json: json}))
+        res.json(json)
+
+  update: (req, res) =>
+    json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
+
+    @model_type.find req.params.id, (err, model) =>
+      return @sendError(res, err) if err
+      return res.status(404).send() unless model
 
       event_data = {req: res, res: res, model: model}
-      @constructor.trigger('pre:create', event_data)
+      @constructor.trigger('pre:update', event_data)
 
-      model.save (err) =>
+      model.save model.parse(json), (err) =>
         return @sendError(res, err) if err
 
         event_data.model = model
-        json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
+        json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
         @render req, json, (err, json) =>
           return @sendError(res, err) if err
-          @constructor.trigger('post:create', _.extend(event_data, {json: json}))
+          @constructor.trigger('post:update', _.extend(event_data, {json: json}))
           res.json(json)
 
-    catch err
-      @sendError(res, err)
-
-  update: (req, res) =>
-    try
-      json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
-
-      @model_type.find req.params.id, (err, model) =>
-        return @sendError(res, err) if err
-        return res.status(404).send() unless model
-
-        event_data = {req: res, res: res, model: model}
-        @constructor.trigger('pre:update', event_data)
-
-        model.save model.parse(json), (err) =>
-          return @sendError(res, err) if err
-
-          event_data.model = model
-          json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
-          @render req, json, (err, json) =>
-            return @sendError(res, err) if err
-            @constructor.trigger('post:update', _.extend(event_data, {json: json}))
-            res.json(json)
-
-    catch err
-      @sendError(res, err)
-
   destroy: (req, res) =>
-    try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:destroy', event_data)
+    event_data = {req: res, res: res}
+    @constructor.trigger('pre:destroy', event_data)
 
-      @model_type.exists req.params.id, (err, exists) =>
+    @model_type.exists req.params.id, (err, exists) =>
+      return @sendError(res, err) if err
+      return res.status(404).send() unless exists
+
+      @model_type.destroy {id: req.params.id}, (err) =>
         return @sendError(res, err) if err
-        return res.status(404).send() unless exists
-
-        @model_type.destroy {id: req.params.id}, (err) =>
-          return @sendError(res, err) if err
-          @constructor.trigger('post:destroy', event_data)
-          res.status(200).send()
-
-    catch err
-      @sendError(res, err)
+        @constructor.trigger('post:destroy', event_data)
+        res.status(200).send()
 
   destroyByQuery: (req, res) =>
-    try
-      event_data = {req: res, res: res}
-      @constructor.trigger('pre:destroyByQuery', event_data)
-      @model_type.destroy JSONUtils.parse(req.query), (err) =>
-        return @sendError(res, err) if err
-        @constructor.trigger('post:destroyByQuery', event_data)
-        res.send(200)
-    catch err
-      @sendError(res, err)
+    event_data = {req: res, res: res}
+    @constructor.trigger('pre:destroyByQuery', event_data)
+    @model_type.destroy JSONUtils.parse(req.query), (err) =>
+      return @sendError(res, err) if err
+      @constructor.trigger('post:destroyByQuery', event_data)
+      res.send(200)
 
   head: (req, res) =>
-    try
-      @model_type.exists req.params.id, (err, exists) =>
-        return @sendError(res, err) if err
-        res.send(if exists then 200 else 404)
-    catch err
-      @sendError(res, err)
+    @model_type.exists req.params.id, (err, exists) =>
+      return @sendError(res, err) if err
+      res.send(if exists then 200 else 404)
 
   headByQuery: (req, res) =>
-    try
-      @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
-        return @sendError(res, err) if err
-        res.send(if exists then 200 else 404)
-    catch err
-      @sendError(res, err)
+    @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
+      return @sendError(res, err) if err
+      res.send(if exists then 200 else 404)
 
   render: (req, json, callback) ->
     template_name = req.query.$render or req.query.$template or @default_template
@@ -196,10 +166,20 @@ module.exports = class RESTController
     res.header('cache-control', 'no-cache')
     next()
 
+  _reqToCRUD: (req) ->
+    switch (req.method)
+      when 'GET' then return (if req.params.id then 'show' else 'index')
+      when 'POST' then return 'create'
+      when 'PUT' then return 'update'
+      when 'DELETE' then return (if req.params.id then 'destroy' else 'destroyByQuery')
+      when 'HEAD' then return (if req.params.id then 'head' else 'headByQuery')
+
   _call: (fn) =>
     auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
     auths.push(@setHeaders)
-    auths.push(fn)
+    auths.push (req, res, next) =>
+      (return res.send(405) if @_reqToCRUD(req) in @blocked) if @blocked
+      try fn(req, res, next) catch err then @sendError(res, err)
     return auths
 
 _.extend(RESTController, Backbone.Events)
