@@ -9,7 +9,6 @@ JSONUtils = require 'backbone-orm/lib/json_utils'
 Utils = require 'backbone-orm/lib/utils'
 
 request = require 'supertest'
-express = require 'express'
 
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
@@ -23,6 +22,7 @@ module.exports = (options, callback) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
+  APP_FACTORY = options.app_factory
   BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = '/test/flats'
@@ -64,7 +64,7 @@ module.exports = (options, callback) ->
     it 'Cursor can chain limit with paging', (done) ->
       LIMIT = 3
 
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
@@ -82,7 +82,7 @@ module.exports = (options, callback) ->
     it 'Cursor can chain limit with paging (no true or false)', (done) ->
       LIMIT = 3
 
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
@@ -99,7 +99,7 @@ module.exports = (options, callback) ->
     it 'Cursor can chain limit without paging', (done) ->
       LIMIT = 3
 
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
@@ -115,7 +115,7 @@ module.exports = (options, callback) ->
     it 'Cursor can chain limit and offset with paging', (done) ->
       LIMIT = 2; OFFSET = 1
 
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
@@ -133,7 +133,7 @@ module.exports = (options, callback) ->
     it 'Cursor can select fields with paging', (done) ->
       FIELD_NAMES = ['id', 'name']
 
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
@@ -150,7 +150,7 @@ module.exports = (options, callback) ->
     it 'Cursor can select values with paging', (done) ->
       FIELD_NAMES = ['id', 'name']
 
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
       request(app)
@@ -171,7 +171,7 @@ module.exports = (options, callback) ->
         assert.ok(!err, "No errors: #{err}")
         assert.ok(!!model, 'model')
 
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)

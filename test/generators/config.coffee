@@ -9,7 +9,6 @@ JSONUtils = require 'backbone-orm/lib/json_utils'
 Utils = require 'backbone-orm/lib/utils'
 
 request = require 'supertest'
-express = require 'express'
 
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
@@ -23,6 +22,7 @@ module.exports = (options, callback) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
+  APP_FACTORY = options.app_factory
   BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = '/test/flats'
@@ -62,7 +62,7 @@ module.exports = (options, callback) ->
       queue.await done
 
     it 'Blocking routes: index', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['index']})
 
       request(app)
@@ -74,7 +74,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: show', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['show']})
 
       request(app)
@@ -86,7 +86,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: create', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['create']})
 
       request(app)
@@ -99,7 +99,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: update', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['update']})
 
       request(app)
@@ -112,7 +112,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: destroy', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['destroy']})
 
       request(app)
@@ -123,7 +123,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: destroyByQuery', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['destroyByQuery']})
 
       request(app)
@@ -136,7 +136,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: head', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['head']})
 
       request(app)
@@ -148,7 +148,7 @@ module.exports = (options, callback) ->
           done()
 
     it 'Blocking routes: headByQuery', (done) ->
-      app = express(); app.use(express.bodyParser())
+      app = APP_FACTORY()
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['headByQuery']})
 
       request(app)

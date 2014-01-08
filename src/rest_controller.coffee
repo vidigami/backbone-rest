@@ -38,7 +38,7 @@ module.exports = class RESTController
     req = res.req
     @constructor.trigger('error', {req: req, res: res, err: err})
     @logger.error("Error 500 from #{req.method} #{req.url}: #{err}")
-    res.header('content-type', 'text/plain').status(500).send(err.toString())
+    res.header('content-type', 'text/plain'); res.status(500); res.send(err.toString())
 
   index: (req, res) =>
     event_data = {req: res, res: res}
@@ -53,7 +53,7 @@ module.exports = class RESTController
       return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
       unless json
         if cursor.hasCursorQuery('$one')
-          return res.status(404).send()
+          res.status(404); return res.send()
         else
           return res.json(json)
 
@@ -77,7 +77,8 @@ module.exports = class RESTController
     cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
-      return res.status(404).send() unless json
+      unless json
+        res.status(404); return res.send()
       json = _.pick(json, @white_lists.show) if @white_lists.show
 
       @constructor.trigger('post:show', _.extend(event_data, {json: json}))
@@ -107,7 +108,8 @@ module.exports = class RESTController
 
     @model_type.find req.params.id, (err, model) =>
       return @sendError(res, err) if err
-      return res.status(404).send() unless model
+      unless model
+        res.status(404); return res.send()
 
       event_data = {req: res, res: res, model: model}
       @constructor.trigger('pre:update', event_data)
@@ -128,12 +130,13 @@ module.exports = class RESTController
 
     @model_type.exists req.params.id, (err, exists) =>
       return @sendError(res, err) if err
-      return res.status(404).send() unless exists
+      unless exists
+        res.status(404); return res.send()
 
       @model_type.destroy {id: req.params.id}, (err) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:destroy', event_data)
-        res.status(200).send()
+        res.status(200); res.send()
 
   destroyByQuery: (req, res) =>
     event_data = {req: res, res: res}

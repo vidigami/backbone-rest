@@ -9,7 +9,6 @@ JSONUtils = require 'backbone-orm/lib/json_utils'
 Utils = require 'backbone-orm/lib/utils'
 
 request = require 'supertest'
-express = require 'express'
 
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
@@ -23,6 +22,7 @@ module.exports = (options, callback) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
+  APP_FACTORY = options.app_factory
   BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = '/test/flats'
@@ -68,7 +68,7 @@ module.exports = (options, callback) ->
     describe 'index', ->
 
       it 'should return json for all models with no query', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -81,7 +81,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by single key', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -95,7 +95,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by single key respecting whitelist (key included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
@@ -109,7 +109,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
@@ -123,7 +123,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -137,7 +137,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
@@ -151,7 +151,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
@@ -165,7 +165,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
@@ -179,7 +179,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -193,7 +193,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key (when a template is present)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, templates: {show: {$select: ['name']}}, default_template: 'show'})
 
         request(app)
@@ -207,7 +207,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key (in array)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -221,7 +221,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key respecting whitelist (key included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
@@ -235,7 +235,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at']}})
 
         request(app)
@@ -249,7 +249,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -263,7 +263,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
@@ -277,7 +277,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
@@ -291,7 +291,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
@@ -305,7 +305,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should trigger pre:index and post:index events on index', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
 
         class EventController extends RestController
           constructor: ->
@@ -333,7 +333,7 @@ module.exports = (options, callback) ->
 
     describe 'show', ->
       it 'should find an existing model', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -346,7 +346,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should find an existing model with whitelist', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {show: ['id', 'name', 'created_at']}})
 
         attributes = _.clone(MODELS_JSON[0])
@@ -360,7 +360,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should trigger pre:show and post:show events on show', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
 
         class EventController extends RestController
           constructor: ->
@@ -388,7 +388,7 @@ module.exports = (options, callback) ->
 
     describe 'create', ->
       it 'should create a new model and assign an id', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: (new Date).toISOString()}
@@ -403,7 +403,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should create a new model and assign an id with whitelist', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {create: ['id', 'name', 'updated_at']}})
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: (new Date).toISOString()}
@@ -420,7 +420,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should trigger pre:create and post:create events on create', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
 
         class EventController extends RestController
           constructor: ->
@@ -449,7 +449,7 @@ module.exports = (options, callback) ->
 
     describe 'update', ->
       it 'should update an existing model', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         attributes = _.clone(MODELS_JSON[1])
@@ -464,7 +464,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should update an existing model with whitelist', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {update: ['id', 'name', 'updated_at']}})
 
         attributes = _.clone(MODELS_JSON[1])
@@ -479,7 +479,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should trigger pre:update and post:create events on update', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
 
         class EventController extends RestController
           constructor: ->
@@ -509,7 +509,7 @@ module.exports = (options, callback) ->
 
     describe 'delete', ->
       it 'should delete an existing model', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         id = MODELS_JSON[1].id
@@ -527,7 +527,7 @@ module.exports = (options, callback) ->
                 done()
 
       it 'should trigger pre:destroy and post:destroy events on destroy', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
 
         class EventController extends RestController
           constructor: ->
@@ -555,7 +555,7 @@ module.exports = (options, callback) ->
 
     describe 'head', ->
       it 'should test existence of a model by id', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         id = MODELS_JSON[1].id
@@ -581,7 +581,7 @@ module.exports = (options, callback) ->
                     done()
 
       it 'should test existence of a model by id ($exists)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         id = MODELS_JSON[1].id
@@ -611,7 +611,7 @@ module.exports = (options, callback) ->
                     done()
 
       it 'should test existence of a model by name', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         id = MODELS_JSON[1].id
@@ -640,7 +640,7 @@ module.exports = (options, callback) ->
                     done()
 
       it 'should test existence of a model by name ($exists)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         id = MODELS_JSON[1].id

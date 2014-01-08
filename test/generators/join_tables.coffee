@@ -9,7 +9,6 @@ Utils = require 'backbone-orm/lib/utils'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 
 request = require 'supertest'
-express = require 'express'
 
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
@@ -23,6 +22,7 @@ module.exports = (options, callback) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
+  APP_FACTORY = options.app_factory
   BASE_COUNT = 5
   MODELS_JSON = null
   OWNER_ROUTE = '/test/owners'
@@ -45,7 +45,7 @@ module.exports = (options, callback) ->
     sync: SYNC(Owner)
 
   mockApp = ->
-    app = express(); app.use(express.bodyParser())
+    app = APP_FACTORY()
     new RestController(app, {model_type: Owner, route: OWNER_ROUTE}) # this should auto-generated the join table controller and route
     return app
 

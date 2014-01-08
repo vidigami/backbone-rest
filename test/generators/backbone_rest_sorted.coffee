@@ -9,7 +9,6 @@ JSONUtils = require 'backbone-orm/lib/json_utils'
 Utils = require 'backbone-orm/lib/utils'
 
 request = require 'supertest'
-express = require 'express'
 
 ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
 QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
@@ -23,6 +22,7 @@ module.exports = (options, callback) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
+  APP_FACTORY = options.app_factory
   BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = '/test/flats'
@@ -67,7 +67,7 @@ module.exports = (options, callback) ->
 
     describe 'index', ->
       it 'should return json for all models with no query', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -81,7 +81,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by single key', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -95,7 +95,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by single key respecting whitelist (key included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
@@ -109,7 +109,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
@@ -123,7 +123,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -137,7 +137,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
@@ -151,7 +151,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
@@ -165,7 +165,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)
@@ -179,7 +179,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -193,7 +193,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key (in array)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -207,7 +207,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key respecting whitelist (key included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
@@ -221,7 +221,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by single key respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'created_at']}})
 
         request(app)
@@ -235,7 +235,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE})
 
         request(app)
@@ -249,7 +249,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name', 'created_at']}})
 
         request(app)
@@ -263,7 +263,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'name']}})
 
         request(app)
@@ -277,7 +277,7 @@ module.exports = (options, callback) ->
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
-        app = express(); app.use(express.bodyParser())
+        app = APP_FACTORY()
         controller = new RestController(app, {model_type: Flat, route: ROUTE, white_lists: {index: ['id', 'updated_at']}})
 
         request(app)

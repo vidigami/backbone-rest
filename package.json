@@ -7,6 +7,7 @@
   "author": "Kevin Malakoff (https://github.com/kmalakoff)",
   "contributors": ["Gwilym Humphreys (https://github.com/gwilymhumphreys)"],
   "repository": {"type": "git", "url": "https://github.com/vidigami/backbone-rest.git"},
+  "homepage": "http://vidigami.github.io/backbone-orm/backbone-rest.html",
   "keywords": ["backbone", "orm", "backbone-orm", "rest", "server"],
   "engines": {"node": "*"},
   "scripts": {
@@ -25,7 +26,8 @@
     "mocha": "*",
     "powerset": "0.0.x",
     "supertest": "0.7.x",
-    "express": "3.2.x"
+    "express": "3.2.x",
+    "restify": "2.6.x"
   },
   "dependencies": {
     "underscore": "1.5.x",
