@@ -10,6 +10,13 @@ ORMUtils = require 'backbone-orm/lib/utils'
 JSONUtils = require 'backbone-orm/lib/json_utils'
 JoinTableControllerSingleton = require './join_table_controller_singleton'
 
+# Helper to smooth out differences between restify and express APIs
+# If more differences are detected, use an adaptor
+
+getRequestPath = (req) ->
+  return req.path() if _.isFunction(req.path)
+  req.path
+
 module.exports = class RESTController
 
   # TODO: add raw_json vs going through parse and toJSON on the models
@@ -170,13 +177,13 @@ module.exports = class RESTController
     next()
 
   _reqToCRUD: (req) ->
-    if req.path is @route
+    if getRequestPath(req) is @route
       switch req.method
         when 'GET' then return 'index'
         when 'POST' then return 'create'
         when 'DELETE' then return 'destroyByQuery'
         when 'HEAD' then return 'headByQuery'
-    else if req.params.id and req.path is "#{@route}/#{req.params.id}"
+    else if req.params.id and getRequestPath(req) is "#{@route}/#{req.params.id}"
       switch req.method
         when 'GET' then  return 'show'
         when 'PUT' then return 'update'

@@ -34,7 +34,7 @@ module.exports = (options, callback) ->
     }, BASE_SCHEMA)
     sync: SYNC(Flat, options.cache)
 
-  describe "RestController (sorted: false, cache: #{options.cache} embed: #{options.embed})", ->
+  describe "RestController (sorted: false, cache: #{options.cache} embed: #{options.embed}, framework: #{options.app_factory_name})", ->
 
     before (done) -> return done() unless options.before; options.before([Flat], done)
     after (done) -> callback(); done()

@@ -1,8 +1,9 @@
 _ = require 'underscore'
+path = require 'path'
 Queue = require 'backbone-orm/lib/queue'
+DirectoryUtils = require '../lib/directory_utils'
 
-express = require 'express'
-restify = require 'restify'
+FRAMEWORK_APP_FACTORIES = DirectoryUtils.functionModules path.resolve path.dirname(module.filename), '../lib/frameworks'
 
 module.exports = (options, callback) ->
   test_parameters = _.extend options,
@@ -14,19 +15,9 @@ module.exports = (options, callback) ->
     sync: require('backbone-orm/lib/memory/sync')
     embed: true
 
-  app_factories = [
-    -> app = express(); app.use(express.bodyParser()); app,
-    # TODO: set up restify for testing
-    # -> app = restify.createServer({
-    #     name: 'testapp'
-    #     version: '0.0.0'
-    #   }); app.use(restify.bodyParser()); app.address = (-> {address: {port: 80}}); app
-  ]
-
   queue = new Queue(1)
-  for app_factory in app_factories
-    do (app_factory) ->
-      queue.defer (callback) ->
-        require('../generators/all')(_.extend({app_factory}, test_parameters), callback)
+  _.each FRAMEWORK_APP_FACTORIES, (app_factory, app_factory_name) ->
+    queue.defer (callback) ->
+      require('../generators/all')(_.extend({app_factory, app_factory_name}, test_parameters), callback)
 
   queue.await callback

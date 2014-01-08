@@ -49,7 +49,7 @@ module.exports = (options, callback) ->
     new RestController(app, {model_type: Owner, route: OWNER_ROUTE}) # this should auto-generated the join table controller and route
     return app
 
-  describe "Many to Many (cache: #{options.cache} embed: #{options.embed})", ->
+  describe "Many to Many (cache: #{options.cache} embed: #{options.embed}, framework: #{options.app_factory_name})", ->
 
     before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
     after (done) -> callback(); done()
