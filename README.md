@@ -4,6 +4,12 @@
 
 By using BackboneREST on the server and BackboneORM's JSON rendering DSL, you can save time in defining JSON APIs.
 
+Supported frameworks:
+
+* [Express](http://expressjs.com/)
+* [restify](http://mcavage.me/node-restify)
+
+
 #### Examples (CoffeeScript)
 
 ```coffeescript
