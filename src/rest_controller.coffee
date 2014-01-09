@@ -13,10 +13,6 @@ JoinTableControllerSingleton = require './join_table_controller_singleton'
 # Helper to smooth out differences between restify and express APIs
 # If more differences are detected, use an adaptor
 
-getRequestPath = (req) ->
-  return req.path() if _.isFunction(req.path)
-  req.path
-
 module.exports = class RESTController
 
   # TODO: add raw_json vs going through parse and toJSON on the models
@@ -41,6 +37,8 @@ module.exports = class RESTController
 
     JoinTableControllerSingleton.generateByOptions(app, options)
 
+  requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
+
   sendError: (res, err) ->
     req = res.req
     @constructor.trigger('error', {req: req, res: res, err: err})
@@ -50,6 +48,7 @@ module.exports = class RESTController
   index: (req, res) =>
     event_data = {req: res, res: res}
     @constructor.trigger('pre:index', event_data)
+
     cursor = @model_type.cursor(JSONUtils.parse(req.query))
     cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
     cursor.toJSON (err, json) =>
@@ -60,7 +59,7 @@ module.exports = class RESTController
       return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
       unless json
         if cursor.hasCursorQuery('$one')
-          res.status(404); return res.send()
+          return res.send(404)
         else
           return res.json(json)
 
@@ -84,8 +83,7 @@ module.exports = class RESTController
     cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
-      unless json
-        res.status(404); return res.send()
+      return res.send(404) unless json
       json = _.pick(json, @white_lists.show) if @white_lists.show
 
       @constructor.trigger('post:show', _.extend(event_data, {json: json}))
@@ -115,8 +113,7 @@ module.exports = class RESTController
 
     @model_type.find req.params.id, (err, model) =>
       return @sendError(res, err) if err
-      unless model
-        res.status(404); return res.send()
+      return res.send(404) unless model
 
       event_data = {req: res, res: res, model: model}
       @constructor.trigger('pre:update', event_data)
@@ -137,13 +134,12 @@ module.exports = class RESTController
 
     @model_type.exists req.params.id, (err, exists) =>
       return @sendError(res, err) if err
-      unless exists
-        res.status(404); return res.send()
+      return res.send(404) unless exists
 
       @model_type.destroy {id: req.params.id}, (err) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:destroy', event_data)
-        res.status(200); res.send()
+        res.send(200)
 
   destroyByQuery: (req, res) =>
     event_data = {req: res, res: res}
@@ -177,13 +173,14 @@ module.exports = class RESTController
     next()
 
   _reqToCRUD: (req) ->
-    if getRequestPath(req) is @route
+    req_path = @requestValue(req, 'path')
+    if req_path is @route
       switch req.method
         when 'GET' then return 'index'
         when 'POST' then return 'create'
         when 'DELETE' then return 'destroyByQuery'
         when 'HEAD' then return 'headByQuery'
-    else if req.params.id and getRequestPath(req) is "#{@route}/#{req.params.id}"
+    else if req.params.id and req_path is "#{@route}/#{req.params.id}"
       switch req.method
         when 'GET' then  return 'show'
         when 'PUT' then return 'update'
