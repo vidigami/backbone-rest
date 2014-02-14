@@ -26,7 +26,7 @@ class JoinTableControllerSingleton
     for key, relation of schema.relations
       continue unless (relation and relation.join_table)
       try
-        join_table_url = _.result(relation.join_table.prototype, 'url')
+        join_table_url = _.result(new relation.join_table, 'url')
         join_table_parts = join_table_url.split('/')
         join_table_endpoint = join_table_parts.pop()
       catch err
