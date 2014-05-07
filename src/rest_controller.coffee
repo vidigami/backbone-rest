@@ -4,6 +4,7 @@
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
+path = require 'path'
 _ = require 'underscore'
 Backbone = require 'backbone'
 ORMUtils = require 'backbone-orm/lib/utils'
@@ -21,7 +22,7 @@ module.exports = class RESTController
     @white_lists or= {}; @templates or= {}
     @logger or= console
 
-    @route = "#{@route_prefix}#{@route}" if @route_prefix
+    @route = path.join(@route_prefix, @route) if @route_prefix
 
     app.get "#{@route}/:id", @_call(@show)
     app.get @route, @_call(@index)

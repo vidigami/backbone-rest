@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.5.7
+* Bug fix for route_prefix joining
+
 ### 0.5.6
 * Compatability fix for Backbone 1.1.1
 
