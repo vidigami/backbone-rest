@@ -669,4 +669,3 @@ module.exports = (options, callback) ->
                     assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
                     assert.ok(!res.body.result, "No longer exists by name. Body: #{util.inspect(res.body)}")
                     done()
-

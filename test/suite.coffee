@@ -12,10 +12,11 @@ option_sets = require 'backbone-orm/test/option_sets'
 framework_queue = new Queue(1)
 for app_factory_name, app_factory of FRAMEWORK_APP_FACTORIES
   do (app_factory_name, app_factory) -> framework_queue.defer (callback) ->
+
     queue = new Queue(1)
     for options in option_sets
       do (options) -> queue.defer (callback) ->
-        console.log "\nBackbone REST: Running tests with options: ", options
+        console.log "\nBackbone REST (#{app_factory_name}): Running tests with options: ", options
         require('./unit/all_generators')(_.extend({app_factory, app_factory_name}, options), callback)
     queue.await -> console.log "Backbone REST: Completed tests for framework #{app_factory_name}"; callback()
 

@@ -25,7 +25,8 @@
     "mocha": "*",
     "supertest": "*",
     "powerset": "0.0.x",
-    "express": "3.x",
+    "express": "4.x",
+    "body-parser": "1.x",
     "restify": "2.x"
   },
   "dependencies": {

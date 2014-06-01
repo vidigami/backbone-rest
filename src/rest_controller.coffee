@@ -47,6 +47,8 @@ module.exports = class RESTController
     res.header('content-type', 'text/plain'); res.status(500); res.send(err.toString())
 
   index: (req, res) =>
+    return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
+
     event_data = {req: res, res: res}
     @constructor.trigger('pre:index', event_data)
 
