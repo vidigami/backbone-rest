@@ -22,16 +22,15 @@
   },
   "devDependencies": {
     "coffee-script": "*",
-    "codo": "1.7.x",
     "mocha": "*",
+    "supertest": "*",
     "powerset": "0.0.x",
-    "supertest": "0.7.x",
-    "express": "3.2.x",
-    "restify": "2.6.x"
+    "express": "3.x",
+    "restify": "2.x"
   },
   "dependencies": {
-    "underscore": "1.5.x",
-    "backbone": ">=1.0.0",
+    "underscore": "1.x",
+    "backbone": "1.x",
     "backbone-orm": "0.5.x"
   }
 }
