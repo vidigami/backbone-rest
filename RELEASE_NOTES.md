@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.6.0
+* Update for BackboneORM 0.6.0
+
 ### 0.5.7
 * Bug fix for route_prefix joining
 

@@ -1,6 +1,8 @@
 path = require 'path'
 _ = require 'underscore'
-Queue = require 'backbone-orm/lib/queue'
+
+BackboneORM = require 'backbone-orm'
+Queue = BackboneORM.Queue
 
 DirectoryUtils = require './lib/directory_utils'
 

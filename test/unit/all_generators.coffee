@@ -1,4 +1,5 @@
 _ = require 'underscore'
+BackboneORM = require 'backbone-orm'
 
 module.exports = (options, callback) ->
   test_parameters = _.extend options,
@@ -7,7 +8,7 @@ module.exports = (options, callback) ->
       name: ['String', indexed: true]
       created_at: 'DateTime'
       updated_at: 'DateTime'
-    sync: require('backbone-orm/lib/memory/sync')
+    sync: BackboneORM.sync
     embed: true
 
   require('../generators/all')(test_parameters, callback)

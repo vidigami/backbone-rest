@@ -7,8 +7,10 @@
 path = require 'path'
 _ = require 'underscore'
 Backbone = require 'backbone'
-ORMUtils = require 'backbone-orm/lib/utils'
-JSONUtils = require 'backbone-orm/lib/json_utils'
+
+BackboneORM = require 'backbone-orm'
+ORMUtils = BackboneORM.Utils
+JSONUtils = BackboneORM.JSONUtils
 JoinTableControllerSingleton = require './join_table_controller_singleton'
 
 # Helper to smooth out differences between restify and express APIs

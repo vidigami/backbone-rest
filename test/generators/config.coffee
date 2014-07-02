@@ -2,16 +2,15 @@ util = require 'util'
 assert = require 'assert'
 _ = require 'underscore'
 Backbone = require 'backbone'
-Queue = require 'backbone-orm/lib/queue'
 
-Fabricator = require 'backbone-orm/test/fabricator'
-JSONUtils = require 'backbone-orm/lib/json_utils'
-Utils = require 'backbone-orm/lib/utils'
+BackboneORM = require 'backbone-orm'
+Queue = BackboneORM.Queue
+JSONUtils = BackboneORM.JSONUtils
+Utils = BackboneORM.Utils
+Fabricator = BackboneORM.Fabricator
+ModelCache = BackboneORM.CacheSingletons.ModelCache
 
 request = require 'supertest'
-
-ModelCache = require('backbone-orm/lib/cache/singletons').ModelCache
-QueryCache = require('backbone-orm/lib/cache/singletons').QueryCache
 
 RestController = require '../../lib/rest_controller'
 
@@ -43,7 +42,6 @@ module.exports = (options, callback) ->
 
       # reset caches
       queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure query cache
-      queue.defer (callback) -> QueryCache.configure({enabled: !!options.query_cache, verbose: false}).reset(callback) # configure query cache
 
       queue.defer (callback) -> Utils.resetSchemas [Flat], callback
 
