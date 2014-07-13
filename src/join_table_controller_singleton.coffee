@@ -35,6 +35,7 @@ class JoinTableControllerSingleton
 
       join_table_options = _.clone(options)
       join_table_options.route = path.join(route_root, join_table_endpoint)
+      join_table_options.route = "/#{join_table_options.route}" unless join_table_options.route[0] is '/'
       continue if @join_tables[join_table_options.route] # already exists
       delete join_table_options[key] for key in ['white_lists', 'templates', 'default_template']
       join_table_options.model_type = relation.join_table
