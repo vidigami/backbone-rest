@@ -19,15 +19,15 @@ sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
 option_sets = require('backbone-orm/test/option_sets')
 parameters = __test__parameters if __test__parameters?
-app_frameworks = if __test__app_framework? then [__test__app_framework] else require '../lib/all_frameworks'
-((makeTests) -> (makeTests(option_set, app_framework) for option_set in option_sets) for app_framework in app_frameworks; return
-) module.exports = (options, app_framework) ->
+app_framework = __test__app_framework if __test__app_framework?
+_.each option_sets, module.exports = (options) ->
   options = _.extend({}, options, parameters) if parameters
+  options.app_framework = app_framework if app_framework
 
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
-  APP_FACTORY = app_framework.factory
+  APP_FACTORY = options.app_framework.factory
   BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = '/test/flats'
@@ -39,7 +39,7 @@ app_frameworks = if __test__app_framework? then [__test__app_framework] else req
     }, BASE_SCHEMA)
     sync: SYNC(Flat, options.cache)
 
-  describe "RestController (sorted: false, #{options.$tags}, framework: #{app_framework.name})", ->
+  describe "RestController (sorted: false, #{options.$tags}, framework: #{options.app_framework.name})", ->
     after (callback) ->
       queue = new Queue()
       queue.defer (callback) -> ModelCache.reset(callback)
