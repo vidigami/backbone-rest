@@ -30,7 +30,7 @@ module.exports = class DirectoryUtils
   @modules: (directory) ->
     results = {}
     for file in DirectoryUtils.files(directory)
-      try results[removeDirectoryAndExtension(file, directory)] = require(file) catch err then console.log err
+      try results[removeDirectoryAndExtension(file, directory)] = require(file) catch err then console.log err.stack or err
     return results
 
   @functionModules: (directory) ->

@@ -4,15 +4,11 @@ _ = require 'underscore'
 BackboneORM = require 'backbone-orm'
 Queue = BackboneORM.Queue
 
-DirectoryUtils = require './lib/directory_utils'
-
-FRAMEWORK_APP_FACTORIES = DirectoryUtils.functionModules(path.resolve(path.dirname(module.filename), './lib/frameworks'))
-
 option_sets = require 'backbone-orm/test/option_sets'
 # option_sets = option_sets.slice(0, 1)
 
 framework_queue = new Queue(1)
-for app_factory_name, app_factory of FRAMEWORK_APP_FACTORIES
+for app_factory_name, app_factory of require './lib/all_frameworks'
   do (app_factory_name, app_factory) -> framework_queue.defer (callback) ->
 
     queue = new Queue(1)

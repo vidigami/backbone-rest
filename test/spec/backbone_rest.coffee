@@ -17,26 +17,34 @@ RestController = require '../../lib/rest_controller'
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
-module.exports = (options, callback) ->
+option_sets = require('backbone-orm/test/option_sets')
+parameters = __test__parameters if __test__parameters?
+app_frameworks = if __test__app_framework? then [__test__app_framework] else require '../lib/all_frameworks'
+((makeTests) -> (makeTests(option_set, app_framework) for option_set in option_sets) for app_framework in app_frameworks; return
+) module.exports = (options, app_framework) ->
+  options = _.extend({}, options, parameters) if parameters
+
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
-  APP_FACTORY = options.app_factory
+  APP_FACTORY = app_framework.factory
   BASE_COUNT = 5
   MODELS_JSON = null
   ROUTE = '/test/flats'
 
-  class Flat extends Backbone.Model
-    urlRoot: "#{DATABASE_URL}/flats"
-    schema: _.defaults({
-      boolean: 'Boolean'
-    }, BASE_SCHEMA)
-    sync: SYNC(Flat, options.cache)
+  describe "RestController (sorted: false, #{options.$tags}, framework: #{app_framework.name})", ->
+    Flat = null
+    before (done) ->
+      class Flat extends Backbone.Model
+        urlRoot: "#{DATABASE_URL}/flats"
+        schema: _.defaults({
+          boolean: 'Boolean'
+        }, BASE_SCHEMA)
+        sync: SYNC(Flat, options.cache)
 
-  describe "RestController (sorted: false, cache: #{options.cache} embed: #{options.embed}, framework: #{options.app_factory_name})", ->
+      return done() unless options.before; options.before([Flat], done)
 
-    before (done) -> return done() unless options.before; options.before([Flat], done)
-    after (done) -> callback(); done()
+
     beforeEach (done) ->
       queue = new Queue(1)
 

@@ -17,17 +17,24 @@ RestController = require '../../lib/rest_controller'
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
-module.exports = (options, callback) ->
+option_sets = require('backbone-orm/test/option_sets')
+console.log option_sets
+parameters = __test__parameters if __test__parameters?
+app_frameworks = if __test__app_framework? then [__test__app_framework] else require '../lib/all_frameworks'
+((makeTests) -> (makeTests(option_set, app_framework) for option_set in option_sets) for app_framework in app_frameworks; return
+) module.exports = (options, app_framework) ->
+  options = _.extend({}, options, parameters) if parameters
+
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
-  APP_FACTORY = options.app_factory
+  APP_FACTORY = app_framework.factory
   BASE_COUNT = 5
   MODELS_JSON = null
   OWNER_ROUTE = '/test/owners'
   JOIN_TABLE_ROUTE = '/test/owners_reverses'
 
-  ModelCache.configure({enabled: !!options.cache, max: 100}).hardReset() # configure model cache
+  ModelCache.configure({enabled: !!options.cache, max: 100}).reset() # configure model cache
 
   class Reverse extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/reverses"
@@ -48,10 +55,10 @@ module.exports = (options, callback) ->
     new RestController(app, {model_type: Owner, route: OWNER_ROUTE}) # this should auto-generated the join table controller and route
     return app
 
-  describe "Many to Many (cache: #{options.cache} embed: #{options.embed}, framework: #{options.app_factory_name})", ->
+  describe "Many to Many (#{options.$tags}, framework: #{app_framework.name})", ->
 
     before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
-    after (done) -> callback(); done()
+
     beforeEach (done) ->
       require('../../lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
