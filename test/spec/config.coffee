@@ -22,7 +22,6 @@ parameters = __test__parameters if __test__parameters?
 app_frameworks = if __test__app_framework? then [__test__app_framework] else require '../lib/all_frameworks'
 ((makeTests) -> (makeTests(option_set, app_framework) for option_set in option_sets) for app_framework in app_frameworks; return
 ) module.exports = (options, app_framework) ->
-  console.log options, app_framework
   options = _.extend({}, options, parameters) if parameters
 
   DATABASE_URL = options.database_url or ''
