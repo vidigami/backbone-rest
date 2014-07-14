@@ -34,8 +34,6 @@ app_frameworks = if __test__app_framework? then [__test__app_framework] else req
   OWNER_ROUTE = '/test/owners'
   JOIN_TABLE_ROUTE = '/test/owners_reverses'
 
-  ModelCache.configure({enabled: !!options.cache, max: 100}).reset() # configure model cache
-
   class Reverse extends Backbone.Model
     urlRoot: "#{DATABASE_URL}/reverses"
     schema: _.defaults({
@@ -57,21 +55,19 @@ app_frameworks = if __test__app_framework? then [__test__app_framework] else req
 
   describe "Many to Many (#{options.$tags}, framework: #{app_framework.name})", ->
 
-    before (done) -> return done() unless options.before; options.before([Reverse, Owner], done)
+    after (callback) ->
+      queue = new Queue()
+      queue.defer (callback) -> ModelCache.reset(callback)
+      queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback
+      queue.await callback
 
-    beforeEach (done) ->
+    beforeEach (callback) ->
       require('../../lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)
-
-      # reset caches
-      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure query cache
-
-      # destroy all
+      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure model cache
       queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback
-
-      # create all
       queue.defer (callback) ->
         create_queue = new Queue()
 
@@ -100,7 +96,7 @@ app_frameworks = if __test__app_framework? then [__test__app_framework] else req
 
         save_queue.await callback
 
-      queue.await done
+      queue.await callback
 
     it 'Handles a get query for a hasMany and hasMany two sided relation', (done) ->
       app = mockApp()

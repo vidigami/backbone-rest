@@ -32,27 +32,24 @@ app_frameworks = if __test__app_framework? then [__test__app_framework] else req
   MODELS_JSON = null
   ROUTE = '/test/flats'
 
+  class Flat extends Backbone.Model
+    urlRoot: "#{DATABASE_URL}/flats"
+    schema: _.defaults({
+      boolean: 'Boolean'
+    }, BASE_SCHEMA)
+    sync: SYNC(Flat, options.cache)
+
   describe "RestController (sorted: false, #{options.$tags}, framework: #{app_framework.name})", ->
-    Flat = null
-    before (done) ->
-      class Flat extends Backbone.Model
-        urlRoot: "#{DATABASE_URL}/flats"
-        schema: _.defaults({
-          boolean: 'Boolean'
-        }, BASE_SCHEMA)
-        sync: SYNC(Flat, options.cache)
-
-      return done() unless options.before; options.before([Flat], done)
-
-
-    beforeEach (done) ->
-      queue = new Queue(1)
-
-      # reset caches
-      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure query cache
-
+    after (callback) ->
+      queue = new Queue()
+      queue.defer (callback) -> ModelCache.reset(callback)
       queue.defer (callback) -> Utils.resetSchemas [Flat], callback
+      queue.await callback
 
+    beforeEach (callback) ->
+      queue = new Queue(1)
+      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}).reset(callback) # configure model cache
+      queue.defer (callback) -> Utils.resetSchemas [Flat], callback
       queue.defer (callback) -> Fabricator.create(Flat, BASE_COUNT, {
         name: Fabricator.uniqueId('flat_')
         created_at: Fabricator.date
@@ -64,8 +61,7 @@ app_frameworks = if __test__app_framework? then [__test__app_framework] else req
           MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
           callback()
       )
-
-      queue.await done
+      queue.await callback
 
     ######################################
     # index
