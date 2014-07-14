@@ -11,7 +11,7 @@
   "keywords": ["backbone", "orm", "backbone-orm", "rest", "server"],
   "engines": {"node": "*"},
   "scripts": {
-    "test": "npm run build; NODE_ENV=test mocha test/suite.coffee --compilers coffee:coffee-script/register --reporter spec --timeout 10000",
+    "test": "npm run build; NODE_ENV=test mocha 'test/spec/*.coffee' --reporter spec",
     "build": "coffee -o lib -c src",
     "watch": "coffee -o lib -w src",
     "clean": "rm -rf lib/*",
