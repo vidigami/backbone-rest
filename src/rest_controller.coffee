@@ -42,11 +42,12 @@ module.exports = class RESTController
 
   requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
 
+  sendStatus: (res, status) -> res.status(status); res.json({})
   sendError: (res, err) ->
     req = res.req
     @constructor.trigger('error', {req: req, res: res, err: err})
     @logger.error("Error 500 from #{req.method} #{req.url}: #{err}")
-    res.header('content-type', 'text/plain'); res.status(500); res.send(err.toString())
+    res.header('content-type', 'text/plain'); res.status(500); @sendStatus(res, err.toString())
 
   index: (req, res) =>
     return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
@@ -64,7 +65,7 @@ module.exports = class RESTController
       return res.json({result: json}) if cursor.hasCursorQuery('$count') or cursor.hasCursorQuery('$exists')
       unless json
         if cursor.hasCursorQuery('$one')
-          return res.send(404)
+          return @sendStatus(res, 404)
         else
           return res.json(json)
 
@@ -88,7 +89,7 @@ module.exports = class RESTController
     cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
-      return res.send(404) unless json
+      return @sendStatus(res, 404) unless json
       json = _.pick(json, @white_lists.show) if @white_lists.show
 
       @constructor.trigger('post:show', _.extend(event_data, {json: json}))
@@ -118,7 +119,7 @@ module.exports = class RESTController
 
     @model_type.find req.params.id, (err, model) =>
       return @sendError(res, err) if err
-      return res.send(404) unless model
+      return @sendStatus(res, 404) unless model
 
       event_data = {req: res, res: res, model: model}
       @constructor.trigger('pre:update', event_data)
@@ -139,12 +140,12 @@ module.exports = class RESTController
 
     @model_type.exists req.params.id, (err, exists) =>
       return @sendError(res, err) if err
-      return res.send(404) unless exists
+      return @sendStatus(res, 404) unless exists
 
       @model_type.destroy {id: req.params.id}, (err) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:destroy', event_data)
-        res.send(200)
+        @sendStatus(res, 200)
 
   destroyByQuery: (req, res) =>
     event_data = {req: res, res: res}
@@ -152,17 +153,17 @@ module.exports = class RESTController
     @model_type.destroy JSONUtils.parse(req.query), (err) =>
       return @sendError(res, err) if err
       @constructor.trigger('post:destroyByQuery', event_data)
-      res.send(200)
+      @sendStatus(res, 200)
 
   head: (req, res) =>
     @model_type.exists req.params.id, (err, exists) =>
       return @sendError(res, err) if err
-      res.send(if exists then 200 else 404)
+      @sendStatus(res, if exists then 200 else 404)
 
   headByQuery: (req, res) =>
     @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
       return @sendError(res, err) if err
-      res.send(if exists then 200 else 404)
+      @sendStatus(res, if exists then 200 else 404)
 
   render: (req, json, callback) ->
     template_name = req.query.$render or req.query.$template or @default_template
@@ -196,7 +197,7 @@ module.exports = class RESTController
     auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
     auths.push(@setHeaders)
     auths.push (req, res, next) =>
-      (return res.send(405) if @_reqToCRUD(req) in @blocked) if @blocked
+      (return @sendStatus(res, 405) if @_reqToCRUD(req) in @blocked) if @blocked
       try fn(req, res, next) catch err then @sendError(res, err)
     return auths
 
