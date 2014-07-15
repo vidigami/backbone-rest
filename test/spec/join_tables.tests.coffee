@@ -85,11 +85,13 @@ _.each option_sets, module.exports = (options) ->
       queue.defer (callback) ->
         MODELS_JSON = []
 
-        save_queue = new Queue()
+        save_queue = new Queue(1)
 
         for owner in MODELS.owner
           do (owner) -> save_queue.defer (callback) ->
-            owner.set({reverses: [MODELS.reverse.pop(), MODELS.reverse.pop()]})
+            reverses = [MODELS.reverse.pop(), MODELS.reverse.pop()]
+            # console.log "linking #{owner.id} to #{reverses[0]?.id}, #{reverses[1]?.id}"
+            owner.set({reverses})
             MODELS_JSON.push({owner_id: owner.id, reverse_id: reverse.id}) for reverse in owner.get('reverses').models # save relations
             owner.save callback
 
