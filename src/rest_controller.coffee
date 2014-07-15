@@ -46,13 +46,13 @@ module.exports = class RESTController
   sendError: (res, err) ->
     req = res.req
     @constructor.trigger('error', {req: req, res: res, err: err})
-    @logger.error("Error 500 from #{req.method} #{req.url}: #{err}")
+    @logger.error("Error 500 from #{req.method} #{req.url}: #{err?.stack or err}")
     res.header('content-type', 'text/plain'); res.status(500); @sendStatus(res, err.toString())
 
   index: (req, res) =>
     return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
 
-    event_data = {req: res, res: res}
+    event_data = {req: req, res: res}
     @constructor.trigger('pre:index', event_data)
 
     cursor = @model_type.cursor(JSONUtils.parse(req.query))
@@ -82,7 +82,7 @@ module.exports = class RESTController
           res.json(rendered_json)
 
   show: (req, res) =>
-    event_data = {req: res, res: res}
+    event_data = {req: req, res: res}
     @constructor.trigger('pre:show', event_data)
 
     cursor = @model_type.cursor(req.params.id)
@@ -101,7 +101,7 @@ module.exports = class RESTController
     json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
     model = new @model_type(@model_type::parse(json))
 
-    event_data = {req: res, res: res, model: model}
+    event_data = {req: req, res: res, model: model}
     @constructor.trigger('pre:create', event_data)
 
     model.save (err) =>
@@ -121,7 +121,7 @@ module.exports = class RESTController
       return @sendError(res, err) if err
       return @sendStatus(res, 404) unless model
 
-      event_data = {req: res, res: res, model: model}
+      event_data = {req: req, res: res, model: model}
       @constructor.trigger('pre:update', event_data)
 
       model.save model.parse(json), (err) =>
@@ -135,7 +135,7 @@ module.exports = class RESTController
           res.json(json)
 
   destroy: (req, res) =>
-    event_data = {req: res, res: res}
+    event_data = {req: req, res: res}
     @constructor.trigger('pre:destroy', event_data)
 
     @model_type.exists req.params.id, (err, exists) =>
@@ -148,7 +148,7 @@ module.exports = class RESTController
         @sendStatus(res, 200)
 
   destroyByQuery: (req, res) =>
-    event_data = {req: res, res: res}
+    event_data = {req: req, res: res}
     @constructor.trigger('pre:destroyByQuery', event_data)
     @model_type.destroy JSONUtils.parse(req.query), (err) =>
       return @sendError(res, err) if err
