@@ -2,6 +2,7 @@ Please refer to the following release notes when upgrading your version of Backb
 
 ### 0.6.0
 * Update for BackboneORM 0.6.0
+* Ensured all responses sended JSON
 
 ### 0.5.7
 * Bug fix for route_prefix joining
