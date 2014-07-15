@@ -134,107 +134,107 @@ _.each option_sets, module.exports = (options) ->
                   done()
 
     # TODO: re-enable
-    # it 'Responds with a 409 when creating the same model twice', (done) ->
-    #   app = mockApp()
+    it.skip 'Responds with a 409 when creating the same model twice', (done) ->
+      app = mockApp()
 
-    #   send_post = (callback) ->
-    #     request(app)
-    #       .post(JOIN_TABLE_ROUTE)
-    #       .send({owner_id: 1, reverse_id: 1})
-    #       .type('json')
-    #       .end callback
+      send_post = (callback) ->
+        request(app)
+          .post(JOIN_TABLE_ROUTE)
+          .send({owner_id: 1, reverse_id: 1})
+          .type('json')
+          .end callback
 
-    #   send_post (err, res) ->
-    #     assert.ok(!err, "no errors: #{err}")
-    #     assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-    #     owner_id = JSONUtils.parse(res.body).owner_id
-    #     assert.ok(!!owner_id, "found owner_id")
+      send_post (err, res) ->
+        assert.ok(!err, "no errors: #{err}")
+        assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+        owner_id = JSONUtils.parse(res.body).owner_id
+        assert.ok(!!owner_id, "found owner_id")
 
-    #     send_post (err, res) ->
-    #       assert.ok(!err, "no errors: #{err}")
-    #       assert.equal(res.status, 409, "status not 409. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-    #       done()
+        send_post (err, res) ->
+          assert.ok(!err, "no errors: #{err}")
+          assert.equal(res.status, 409, "status not 409. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          done()
 
-    # it 'Can include related (two-way hasMany) models', (done) ->
-    #   app = mockApp()
-    #   request(app)
-    #     .get(OWNER_ROUTE)
-    #     .query({$one: true, $include: 'reverses'})
-    #     .type('json')
-    #     .end (err, res) ->
-    #       assert.ok(!err, "no errors: #{err}")
-    #       assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-    #       owner_id = JSONUtils.parse(res.body).id
-    #       assert.ok(!!owner_id, "found owner")
+    it.skip 'Can include related (two-way hasMany) models', (done) ->
+      app = mockApp()
+      request(app)
+        .get(OWNER_ROUTE)
+        .query({$one: true, $include: 'reverses'})
+        .type('json')
+        .end (err, res) ->
+          assert.ok(!err, "no errors: #{err}")
+          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          owner_id = JSONUtils.parse(res.body).id
+          assert.ok(!!owner_id, "found owner")
 
-    #   Owner.cursor({$one: true}).include('reverses').toJSON (err, test_model) ->
-    #     assert.ok(!err, "No errors: #{err}")
-    #     assert.ok(test_model, 'found model')
-    #     assert.ok(test_model.reverses, 'Has related reverses')
-    #     assert.equal(test_model.reverses.length, 2, "Has the correct number of related reverses \nExpected: #{2}\nActual: #{test_model.reverses.length}")
-    #     done()
+      Owner.cursor({$one: true}).include('reverses').toJSON (err, test_model) ->
+        assert.ok(!err, "No errors: #{err}")
+        assert.ok(test_model, 'found model')
+        assert.ok(test_model.reverses, 'Has related reverses')
+        assert.equal(test_model.reverses.length, 2, "Has the correct number of related reverses \nExpected: #{2}\nActual: #{test_model.reverses.length}")
+        done()
 
-    # it 'Can query on related (two-way hasMany) models', (done) ->
-    #   Reverse.findOne (err, reverse) ->
-    #     assert.ok(!err, "No errors: #{err}")
-    #     assert.ok(reverse, 'found model')
-    #     Owner.cursor({'reverses.name': reverse.get('name')}).toJSON (err, json) ->
-    #       test_model = json[0]
-    #       assert.ok(!err, "No errors: #{err}")
-    #       assert.ok(test_model, 'found model')
-    #       assert.equal(json.length, 1, "Found the correct number of owners \nExpected: #{1}\nActual: #{json.length}")
-    #       done()
+    it.skip 'Can query on related (two-way hasMany) models', (done) ->
+      Reverse.findOne (err, reverse) ->
+        assert.ok(!err, "No errors: #{err}")
+        assert.ok(reverse, 'found model')
+        Owner.cursor({'reverses.name': reverse.get('name')}).toJSON (err, json) ->
+          test_model = json[0]
+          assert.ok(!err, "No errors: #{err}")
+          assert.ok(test_model, 'found model')
+          assert.equal(json.length, 1, "Found the correct number of owners \nExpected: #{1}\nActual: #{json.length}")
+          done()
 
-    # it 'Can query on related (two-way hasMany) models with included relations', (done) ->
-    #   Reverse.findOne (err, reverse) ->
-    #     assert.ok(!err, "No errors: #{err}")
-    #     assert.ok(reverse, 'found model')
-    #     Owner.cursor({'reverses.name': reverse.get('name')}).include('reverses').toJSON (err, json) ->
-    #       test_model = json[0]
-    #       assert.ok(!err, "No errors: #{err}")
-    #       assert.ok(test_model, 'found model')
-    #       assert.ok(test_model.reverses, 'Has related reverses')
-    #       assert.equal(test_model.reverses.length, 2, "Has the correct number of related reverses \nExpected: #{2}\nActual: #{test_model.reverses.length}")
-    #       done()
+    it.skip 'Can query on related (two-way hasMany) models with included relations', (done) ->
+      Reverse.findOne (err, reverse) ->
+        assert.ok(!err, "No errors: #{err}")
+        assert.ok(reverse, 'found model')
+        Owner.cursor({'reverses.name': reverse.get('name')}).include('reverses').toJSON (err, json) ->
+          test_model = json[0]
+          assert.ok(!err, "No errors: #{err}")
+          assert.ok(test_model, 'found model')
+          assert.ok(test_model.reverses, 'Has related reverses')
+          assert.equal(test_model.reverses.length, 2, "Has the correct number of related reverses \nExpected: #{2}\nActual: #{test_model.reverses.length}")
+          done()
 
-    # it 'Clears its reverse relations on delete when the reverse relation is loaded', (done) ->
-    #   Owner.cursor({$one: true, $include: 'reverses'}).toModels (err, owner) ->
-    #     assert.ok(!err, "No errors: #{err}")
-    #     assert.ok(owner, 'found model')
-    #     owner.get 'reverses', (err, reverses) ->
-    #       assert.ok(!err, "No errors: #{err}")
-    #       assert.ok(reverses, 'found model')
+    it.skip 'Clears its reverse relations on delete when the reverse relation is loaded', (done) ->
+      Owner.cursor({$one: true, $include: 'reverses'}).toModels (err, owner) ->
+        assert.ok(!err, "No errors: #{err}")
+        assert.ok(owner, 'found model')
+        owner.get 'reverses', (err, reverses) ->
+          assert.ok(!err, "No errors: #{err}")
+          assert.ok(reverses, 'found model')
 
-    #       owner.destroy (err, owner) ->
-    #         assert.ok(!err, "No errors: #{err}")
+          owner.destroy (err, owner) ->
+            assert.ok(!err, "No errors: #{err}")
 
-    #         Owner.relation('reverses').join_table.find {owner_id: owner.id}, (err, null_reverses) ->
-    #           assert.ok(!err, "No errors: #{err}")
-    #           assert.equal(null_reverses.length, 0, 'No reverses found for this owner after save')
-    #           done()
+            Owner.relation('reverses').join_table.find {owner_id: owner.id}, (err, null_reverses) ->
+              assert.ok(!err, "No errors: #{err}")
+              assert.equal(null_reverses.length, 0, 'No reverses found for this owner after save')
+              done()
 
-    # it 'Clears its reverse relations on delete when the reverse relation isnt loaded (one-way hasMany)', (done) ->
-    #   Owner.cursor({$one: true}).toModels (err, owner) ->
-    #     assert.ok(!err, "No errors: #{err}")
-    #     assert.ok(owner, 'found model')
-    #     owner.get 'reverses', (err, reverses) ->
-    #       assert.ok(!err, "No errors: #{err}")
-    #       assert.ok(reverses, 'found model')
+    it.skip 'Clears its reverse relations on delete when the reverse relation isnt loaded (one-way hasMany)', (done) ->
+      Owner.cursor({$one: true}).toModels (err, owner) ->
+        assert.ok(!err, "No errors: #{err}")
+        assert.ok(owner, 'found model')
+        owner.get 'reverses', (err, reverses) ->
+          assert.ok(!err, "No errors: #{err}")
+          assert.ok(reverses, 'found model')
 
-    #       owner.destroy (err, owner) ->
-    #         assert.ok(!err, "No errors: #{err}")
+          owner.destroy (err, owner) ->
+            assert.ok(!err, "No errors: #{err}")
 
-    #         Owner.relation('reverses').join_table.find {owner_id: owner.id}, (err, null_reverses) ->
-    #           assert.ok(!err, "No errors: #{err}")
-    #           assert.equal(null_reverses.length, 0, 'No reverses found for this owner after save')
-    #           done()
+            Owner.relation('reverses').join_table.find {owner_id: owner.id}, (err, null_reverses) ->
+              assert.ok(!err, "No errors: #{err}")
+              assert.equal(null_reverses.length, 0, 'No reverses found for this owner after save')
+              done()
 
-    # it 'Can query on a ManyToMany relation by related id', (done) ->
-    #   Owner.findOne (err, owner) ->
-    #     assert.ok(!err, "No errors: #{err}")
-    #     assert.ok(owner, 'found model')
-    #     Reverse.cursor({owner_id: owner.id}).toModels (err, reverses) ->
-    #       assert.ok(!err, "No errors: #{err}")
-    #       assert.ok(reverses, 'found models')
-    #       assert.equal(reverses.length, 2, "Found the correct number of reverses\n expected: #{2}, actual: #{reverses.length}")
-    #       done()
+    it.skip 'Can query on a ManyToMany relation by related id', (done) ->
+      Owner.findOne (err, owner) ->
+        assert.ok(!err, "No errors: #{err}")
+        assert.ok(owner, 'found model')
+        Reverse.cursor({owner_id: owner.id}).toModels (err, reverses) ->
+          assert.ok(!err, "No errors: #{err}")
+          assert.ok(reverses, 'found models')
+          assert.equal(reverses.length, 2, "Found the correct number of reverses\n expected: #{2}, actual: #{reverses.length}")
+          done()
