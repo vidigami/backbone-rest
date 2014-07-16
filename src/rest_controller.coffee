@@ -32,8 +32,9 @@ module.exports = class RESTController
     app.post @route, @_call(@create)
     app.put "#{@route}/:id", @_call(@update)
 
-    app.del "#{@route}/:id", @_call(@destroy)
-    app.del @route, @_call(@destroyByQuery)
+    del = if app.hasOwnProperty('delete') then 'delete' else 'del'
+    app[del] "#{@route}/:id", @_call(@destroy)
+    app[del] @route, @_call(@destroyByQuery)
 
     app.head "#{@route}/:id", @_call(@head)
     app.head @route, @_call(@headByQuery)
