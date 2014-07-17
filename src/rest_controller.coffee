@@ -41,6 +41,7 @@ module.exports = class RESTController
 
     JoinTableControllerSingleton.generateByOptions(app, options)
 
+  requestId: (req) -> if @model_type.schema()?.type('id') is 'Integer' then +req.params.id else req.params.id
   requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
 
   sendStatus: (res, status) -> res.status(status); res.json({})
@@ -56,7 +57,7 @@ module.exports = class RESTController
     event_data = {req: req, res: res}
     @constructor.trigger('pre:index', event_data)
 
-    cursor = @model_type.cursor(JSONUtils.parse(req.query))
+    cursor = @model_type.cursor(JSONUtils.parse(req.query, @model_type))
     cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
@@ -86,7 +87,7 @@ module.exports = class RESTController
     event_data = {req: req, res: res}
     @constructor.trigger('pre:show', event_data)
 
-    cursor = @model_type.cursor(req.params.id)
+    cursor = @model_type.cursor(@requestId(req))
     cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
@@ -118,7 +119,7 @@ module.exports = class RESTController
   update: (req, res) =>
     json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
 
-    @model_type.find req.params.id, (err, model) =>
+    @model_type.find @requestId(req), (err, model) =>
       return @sendError(res, err) if err
       return @sendStatus(res, 404) unless model
 
@@ -139,11 +140,11 @@ module.exports = class RESTController
     event_data = {req: req, res: res}
     @constructor.trigger('pre:destroy', event_data)
 
-    @model_type.exists req.params.id, (err, exists) =>
+    @model_type.exists @requestId(req), (err, exists) =>
       return @sendError(res, err) if err
       return @sendStatus(res, 404) unless exists
 
-      @model_type.destroy {id: req.params.id}, (err) =>
+      @model_type.destroy {id: @requestId(req)}, (err) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:destroy', event_data)
         @sendStatus(res, 200)
@@ -157,7 +158,7 @@ module.exports = class RESTController
       @sendStatus(res, 200)
 
   head: (req, res) =>
-    @model_type.exists req.params.id, (err, exists) =>
+    @model_type.exists @requestId(req), (err, exists) =>
       return @sendError(res, err) if err
       @sendStatus(res, if exists then 200 else 404)
 
@@ -187,7 +188,7 @@ module.exports = class RESTController
         when 'POST' then return 'create'
         when 'DELETE' then return 'destroyByQuery'
         when 'HEAD' then return 'headByQuery'
-    else if req.params.id and req_path is "#{@route}/#{req.params.id}"
+    else if @requestId(req) and req_path is "#{@route}/#{@requestId(req)}"
       switch req.method
         when 'GET' then  return 'show'
         when 'PUT' then return 'update'
