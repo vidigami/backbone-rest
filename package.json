@@ -5,34 +5,45 @@
   "main": "./lib/index.js",
   "license": "MIT",
   "author": "Kevin Malakoff (https://github.com/kmalakoff)",
-  "contributors": ["Gwilym Humphreys (https://github.com/gwilymhumphreys)"],
-  "repository": {"type": "git", "url": "https://github.com/vidigami/backbone-rest.git"},
+  "contributors": [
+    "Gwilym Humphreys (https://github.com/gwilymhumphreys)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vidigami/backbone-rest.git"
+  },
   "homepage": "http://vidigami.github.io/backbone-orm/backbone-rest.html",
-  "keywords": ["backbone", "orm", "backbone-orm", "rest", "server"],
-  "engines": {"node": "*"},
+  "keywords": [
+    "backbone",
+    "orm",
+    "backbone-orm",
+    "rest",
+    "server"
+  ],
+  "engines": {
+    "node": "*"
+  },
   "scripts": {
     "test": "npm run build && npm run test-express3 && npm run test-express4 && npm run test-restify",
     "test-express3": "npm run pre-test-express3 && NODE_ENV=test mocha --require test/parameters_express3.coffee --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
     "pre-test-express3": "cd vendor/express; npm ls >/dev/null 2>/dev/null || npm install",
     "test-express4": "NODE_ENV=test mocha --require test/parameters_express4.coffee --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
     "test-restify": "NODE_ENV=test mocha --require test/parameters_restify.coffee --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
-
     "build": "coffee -o lib -c src",
     "watch": "coffee -o lib -w src",
     "clean": "rm -rf lib/*",
     "prepublish": "npm run build",
-
     "build_dep": "npm run-script backbone-orm build",
     "watch_dep": "npm run-script backbone-orm watch"
   },
   "devDependencies": {
-    "coffee-script": "*",
-    "mocha": "*",
-    "supertest": "*",
-    "powerset": "0.0.x",
-    "express": "4.x",
     "body-parser": "1.x",
-    "restify": "2.x"
+    "coffee-script": "*",
+    "express": "4.x",
+    "mocha": "^1.20.1",
+    "powerset": "0.0.x",
+    "restify": "2.x",
+    "supertest": "*"
   },
   "dependencies": {
     "underscore": "1.6.x",
