@@ -152,7 +152,7 @@ module.exports = class RESTController
   destroyByQuery: (req, res) =>
     event_data = {req: req, res: res}
     @constructor.trigger('pre:destroyByQuery', event_data)
-    @model_type.destroy JSONUtils.parse(req.query), (err) =>
+    @model_type.destroy JSONUtils.parse(req.query, @model_type), (err) =>
       return @sendError(res, err) if err
       @constructor.trigger('post:destroyByQuery', event_data)
       @sendStatus(res, 200)
@@ -163,7 +163,7 @@ module.exports = class RESTController
       @sendStatus(res, if exists then 200 else 404)
 
   headByQuery: (req, res) =>
-    @model_type.exists JSONUtils.parse(req.query), (err, exists) =>
+    @model_type.exists JSONUtils.parse(req.query, @model_type), (err, exists) =>
       return @sendError(res, err) if err
       @sendStatus(res, if exists then 200 else 404)
 
