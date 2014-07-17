@@ -109,7 +109,7 @@ _.each option_sets, module.exports = (options) ->
           assert.ok(!err, "no errors: #{err}")
           assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
           owner_id = JSONUtils.parse(res.body).id
-          assert.ok(!!owner_id, "found owner")
+          assert.ok(!!owner_id, 'found owner')
 
           request(app)
             .get(JOIN_TABLE_ROUTE)
@@ -167,7 +167,7 @@ _.each option_sets, module.exports = (options) ->
           assert.ok(!err, "no errors: #{err}")
           assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
           owner_id = JSONUtils.parse(res.body).id
-          assert.ok(!!owner_id, "found owner")
+          assert.ok(!!owner_id, 'found owner')
 
       Owner.cursor({$one: true}).include('reverses').toJSON (err, test_model) ->
         assert.ok(!err, "No errors: #{err}")
