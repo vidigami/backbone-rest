@@ -41,7 +41,7 @@ module.exports = class RESTController
 
     JoinTableControllerSingleton.generateByOptions(app, options)
 
-  requestId: (req) -> if @model_type.schema()?.type('id') is 'Integer' then +req.params.id else req.params.id
+  requestId: (req) -> JSONUtils.parse({id: req.params.id}, @model_type).id
   requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
 
   sendStatus: (res, status) -> res.status(status); res.json({})
