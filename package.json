@@ -11,8 +11,12 @@
   "keywords": ["backbone", "orm", "backbone-orm", "rest", "server"],
   "engines": {"node": "*"},
   "scripts": {
-    "test": "npm run build; npm run vendor-install; ulimit -n 1024; NODE_ENV=test echo test/parameters_*.coffee | xargs -n1 -I % mocha --require % --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
-    "vendor-install": "cd vendor/express; npm ls >/dev/null || npm install",
+    "test": "npm run build && npm run test-express3 && npm run test-express4 && npm run test-restify",
+    "test-express3": "NODE_ENV=test mocha --require test/parameters_express3.coffee --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
+    "pre-test-express3": "cd vendor/express; npm ls >/dev/null 2>/dev/null || npm install",
+    "test-express4": "NODE_ENV=test mocha --require test/parameters_express4.coffee --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
+    "test-restify": "NODE_ENV=test mocha --require test/parameters_restify.coffee --reporter spec 'test/spec/**/*.tests.coffee' --grep ''",
+
     "build": "coffee -o lib -c src",
     "watch": "coffee -o lib -w src",
     "clean": "rm -rf lib/*",
