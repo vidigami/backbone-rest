@@ -5,20 +5,12 @@
 ###
 
 path = require 'path'
-_ = require 'underscore'
-Backbone = require 'backbone'
-
-BackboneORM = require 'backbone-orm'
-{Utils, JSONUtils} = BackboneORM
+{_, Backbone, Utils, JSONUtils} = require 'backbone-orm'
 
 JoinTableControllerSingleton = require './join_table_controller_singleton'
 
-# Helper to smooth out differences between restify and express APIs
-# If more differences are detected, use an adaptor
-
 module.exports = class RESTController
 
-  # TODO: add raw_json vs going through parse and toJSON on the models
   constructor: (app, options={}) ->
     _.extend(@, options)
     @white_lists or= {}; @templates or= {}

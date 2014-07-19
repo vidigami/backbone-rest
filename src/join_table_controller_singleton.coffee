@@ -5,7 +5,8 @@
 ###
 
 path = require 'path'
-_ = require 'underscore'
+{_} = require 'backbone-orm'
+
 JoinTableController = null
 
 class JoinTableControllerSingleton
