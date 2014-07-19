@@ -8,7 +8,6 @@ Queue = BackboneORM.Queue
 JSONUtils = BackboneORM.JSONUtils
 Utils = BackboneORM.Utils
 Fabricator = BackboneORM.Fabricator
-ModelCache = BackboneORM.CacheSingletons.ModelCache
 
 request = require 'supertest'
 
@@ -56,7 +55,7 @@ _.each option_sets, module.exports = (options) ->
 
     after (callback) ->
       queue = new Queue()
-      queue.defer (callback) -> ModelCache.reset(callback)
+      queue.defer (callback) -> BackboneORM.model_cache.reset(callback)
       queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback
       queue.await callback
 
@@ -65,7 +64,7 @@ _.each option_sets, module.exports = (options) ->
       MODELS = {}
 
       queue = new Queue(1)
-      queue.defer (callback) -> ModelCache.configure({enabled: !!options.cache, max: 100}, callback)
+      queue.defer (callback) -> BackboneORM.configure({model_cache: {enabled: !!options.cache, max: 100}}, callback)
       queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback
       queue.defer (callback) ->
         create_queue = new Queue()
