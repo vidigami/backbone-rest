@@ -21,45 +21,43 @@ _.each option_sets, module.exports = (options) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
-  APP_FACTORY = options.app_framework.factory
   BASE_COUNT = 5
+
+  APP_FACTORY = options.app_framework.factory
   MODELS_JSON = null
   OWNER_ROUTE = '/test/owners'
   JOIN_TABLE_ROUTE = '/test/owners_reverses'
 
-  class Reverse extends Backbone.Model
-    urlRoot: "#{DATABASE_URL}/reverses"
-    schema: _.defaults({
-      owners: -> ['hasMany', Owner]
-    }, BASE_SCHEMA)
-    sync: SYNC(Reverse)
-
-  class Owner extends Backbone.Model
-    urlRoot: "#{DATABASE_URL}/owners"
-    schema: _.defaults({
-      reverses: -> ['hasMany', Reverse]
-    }, BASE_SCHEMA)
-    sync: SYNC(Owner)
-
-  mockApp = ->
-    app = APP_FACTORY()
-    new RestController(app, {model_type: Owner, route: OWNER_ROUTE}) # this should auto-generated the join table controller and route
-    return app
-
   describe "Many to Many (#{options.$tags}, framework: #{options.app_framework.name})", ->
+    Reverse = Owner = mockApp = null
+    before ->
+      BackboneORM.configure {model_cache: {enabled: !!options.cache, max: 100}}
 
-    after (callback) ->
-      queue = new Queue()
-      queue.defer (callback) -> BackboneORM.model_cache.reset(callback)
-      queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback
-      queue.await callback
+      class Reverse extends Backbone.Model
+        urlRoot: "#{DATABASE_URL}/reverses"
+        schema: _.defaults({
+          owners: -> ['hasMany', Owner]
+        }, BASE_SCHEMA)
+        sync: SYNC(Reverse)
+
+      class Owner extends Backbone.Model
+        urlRoot: "#{DATABASE_URL}/owners"
+        schema: _.defaults({
+          reverses: -> ['hasMany', Reverse]
+        }, BASE_SCHEMA)
+        sync: SYNC(Owner)
+
+      mockApp = ->
+        app = APP_FACTORY()
+        new RestController(app, {model_type: Owner, route: OWNER_ROUTE}) # this should auto-generated the join table controller and route
+        return app
+
+    after (callback) -> Utils.resetSchemas [Reverse, Owner], (err) -> BackboneORM.model_cache.reset(); callback(err)
 
     beforeEach (callback) ->
-      require('../../lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)
-      queue.defer (callback) -> BackboneORM.configure({model_cache: {enabled: !!options.cache, max: 100}}, callback)
       queue.defer (callback) -> Utils.resetSchemas [Reverse, Owner], callback
       queue.defer (callback) ->
         create_queue = new Queue()

@@ -21,42 +21,42 @@ _.each option_sets, module.exports = (options) ->
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
   SYNC = options.sync
-  APP_FACTORY = options.app_framework.factory
   BASE_COUNT = 5
+
+  APP_FACTORY = options.app_framework.factory
   MODELS_JSON = null
   ROUTE = '/test/flats'
 
-  class Flat extends Backbone.Model
-    urlRoot: "#{DATABASE_URL}/flats"
-    schema: _.defaults({
-      boolean: 'Boolean'
-    }, BASE_SCHEMA)
-    sync: SYNC(Flat, options.cache)
-
   describe "RestController (sorted: true, #{options.$tags}, framework: #{options.app_framework.name})", ->
+    Flat = null
+    before ->
+      BackboneORM.configure {model_cache: {enabled: !!options.cache, max: 100}}
 
-    after (callback) ->
-      queue = new Queue()
-      queue.defer (callback) -> BackboneORM.model_cache.reset(callback)
-      queue.defer (callback) -> Utils.resetSchemas [Flat], callback
-      queue.await callback
+      class Flat extends Backbone.Model
+        urlRoot: "#{DATABASE_URL}/flats"
+        schema: _.defaults({
+          boolean: 'Boolean'
+        }, BASE_SCHEMA)
+        sync: SYNC(Flat, options.cache)
+
+    after (callback) -> Utils.resetSchemas [Flat], (err) -> BackboneORM.model_cache.reset(); callback(err)
 
     beforeEach (callback) ->
-      queue = new Queue(1)
-      queue.defer (callback) -> BackboneORM.configure({model_cache: {enabled: !!options.cache, max: 100}}, callback)
-      queue.defer (callback) -> Utils.resetSchemas [Flat], callback
-      queue.defer (callback) -> Fabricator.create(Flat, BASE_COUNT, {
-        name: Fabricator.uniqueId('flat_')
-        created_at: Fabricator.date
-        updated_at: Fabricator.date
-      }, (err, models) ->
+      Utils.resetSchemas [Flat], (err) ->
         return callback(err) if err
-        Flat.find {id: {$in: _.map(models, (test) -> test.id)}}, (err, models) -> # reload models in case they are stored with different date precision
+
+        Fabricator.create(Flat, BASE_COUNT, {
+          name: Fabricator.uniqueId('flat_')
+          created_at: Fabricator.date
+          updated_at: Fabricator.date
+        }, (err, models) ->
           return callback(err) if err
-          MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
-          callback()
-      )
-      queue.await callback
+
+          Flat.find {$ids: _.pluck(models, 'id')}, (err, models) -> # reload models in case they are stored with different date precision
+            return callback(err) if err
+            MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
+            callback()
+        )
 
     ######################################
     # index
