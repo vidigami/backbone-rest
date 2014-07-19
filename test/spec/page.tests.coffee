@@ -39,13 +39,13 @@ _.each option_sets, module.exports = (options) ->
         }, BASE_SCHEMA)
         sync: SYNC(Flat, options.cache)
 
-    after (callback) -> Utils.resetSchemas [Flat], (err) -> BackboneORM.model_cache.reset(); callback(err)
+    after (callback) -> Utils.resetSchemas [Flat], callback
 
     beforeEach (callback) ->
       Utils.resetSchemas [Flat], (err) ->
         return callback(err) if err
 
-        Fabricator.create(Flat, BASE_COUNT, {
+        Fabricator.create Flat, BASE_COUNT, {
           name: Fabricator.uniqueId('flat_')
           created_at: Fabricator.date
           updated_at: Fabricator.date
@@ -56,7 +56,6 @@ _.each option_sets, module.exports = (options) ->
             return callback(err) if err
             MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
             callback()
-        )
 
     it 'Cursor can chain limit with paging', (done) ->
       LIMIT = 3
