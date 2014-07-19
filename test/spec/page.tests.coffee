@@ -1,13 +1,8 @@
 util = require 'util'
 assert = require 'assert'
-_ = require 'underscore'
-Backbone = require 'backbone'
 
 BackboneORM = require 'backbone-orm'
-Queue = BackboneORM.Queue
-JSONUtils = BackboneORM.JSONUtils
-Utils = BackboneORM.Utils
-Fabricator = BackboneORM.Fabricator
+{_, Backbone, Queue, Utils, JSONUtils, Fabricator} = BackboneORM
 
 request = require 'supertest'
 

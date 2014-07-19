@@ -2,7 +2,7 @@ _ = require 'underscore'
 RestController = require './rest_controller'
 
 BackboneORM = require 'backbone-orm'
-JSONUtils = BackboneORM.JSONUtils
+{JSONUtils} = BackboneORM
 
 module.exports = class JoinTableController extends RestController
 
