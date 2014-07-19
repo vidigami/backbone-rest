@@ -55,6 +55,7 @@ _.each option_sets, module.exports = (options) ->
     after (callback) -> Utils.resetSchemas [Reverse, Owner], (err) -> BackboneORM.model_cache.reset(); callback(err)
 
     beforeEach (callback) ->
+      require('../../lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)
