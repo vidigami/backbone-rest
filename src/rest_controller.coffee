@@ -7,7 +7,7 @@
 path = require 'path'
 {_, Backbone, Utils, JSONUtils} = require 'backbone-orm'
 
-JoinTableControllerSingleton = require './join_table_controller_singleton'
+JoinTableControllerSingleton = require './lib/join_table_controller_singleton'
 
 module.exports = class RESTController
 

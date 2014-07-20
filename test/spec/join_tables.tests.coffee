@@ -56,7 +56,7 @@ _.each option_sets, module.exports = (options) ->
     after (callback) -> Utils.resetSchemas [Reverse, Owner], callback
 
     beforeEach (callback) ->
-      require('../../lib/join_table_controller_singleton').reset() # reset join tables
+      require('../../lib/lib/join_table_controller_singleton').reset() # reset join tables
       MODELS = {}
 
       queue = new Queue(1)

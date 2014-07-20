@@ -5,3 +5,4 @@
 ###
 
 module.exports = require './rest_controller'
+module.exports.configure = require './lib/configure'
