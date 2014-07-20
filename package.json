@@ -49,6 +49,6 @@
   "dependencies": {
     "underscore": "1.6.x",
     "backbone": "1.1.x",
-    "backbone-orm": "git+https://github.com/vidigami/backbone-orm#develop"
+    "backbone-orm": "git+https://github.com/vidigami/backbone-orm"
   }
 }
