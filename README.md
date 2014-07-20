@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/vidigami/backbone-rest.png)](http://travis-ci.org/vidigami/backbone-rest)
+[![Build Status](https://secure.travis-ci.org/vidigami/backbone-rest.png)](http://travis-ci.org/vidigami/backbone-rest#master)
 
 ![logo](https://github.com/vidigami/backbone-rest/raw/master/media/logo.png)
 
