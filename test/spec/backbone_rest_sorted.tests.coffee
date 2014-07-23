@@ -11,7 +11,7 @@ RestController = require '../../lib/rest_controller'
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
-option_sets = require('backbone-orm/test/option_sets')
+option_sets = BackboneORM.Utils._getTestOptionSets()
 parameters = __test__parameters if __test__parameters?
 app_framework = __test__app_framework if __test__app_framework?
 _.each option_sets, module.exports = (options) ->
