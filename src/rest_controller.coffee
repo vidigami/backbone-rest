@@ -192,7 +192,7 @@ module.exports = class RESTController
     auths.push(@setHeaders)
     auths.push (req, res, next) =>
       (return @sendStatus(res, 405) if @_reqToCRUD(req) in @blocked) if @blocked
-      try fn(req, res, next) catch err then @sendError(res, err)
+      try fn.call(@, req, res, next) catch err then @sendError(res, err)
     return auths
 
 _.extend(RESTController, Backbone.Events)
