@@ -24,7 +24,7 @@
     "node": "*"
   },
   "scripts": {
-    "test": "npm pre-test-express3 && gulp test",
+    "test": "gulp test",
     "build": "coffee -o lib -c src",
     "watch": "coffee -o lib -w src",
     "prepublish": "npm run build"
