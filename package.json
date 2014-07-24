@@ -25,13 +25,9 @@
   },
   "scripts": {
     "test": "npm pre-test-express3 && gulp test",
-    "pre-test-express3": "cd vendor/express; npm install",
     "build": "coffee -o lib -c src",
     "watch": "coffee -o lib -w src",
-    "clean": "rm -rf lib/*",
-    "prepublish": "npm run build",
-    "build_dep": "npm run-script backbone-orm build",
-    "watch_dep": "npm run-script backbone-orm watch"
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "async": "^0.9.0",
