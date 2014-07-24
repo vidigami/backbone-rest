@@ -1,4 +1,4 @@
-express = require '../vendor/express'
+express = require './lib/express3'
 
 module.exports = ->
   app = express()

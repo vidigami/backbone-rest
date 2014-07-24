@@ -34,7 +34,7 @@ gulp.task 'test', ['build', 'install-express3-dependencies'], (callback) ->
   return
 gulp.task 'test-express4', ['build'], testFn({framework: 'express4'})
 gulp.task 'install-express3-dependencies', [], ->
-  return gulp.src('vendor/express/package.json').pipe(install())
+  return gulp.src('test/lib/express3/package.json').pipe(install())
 gulp.task 'test-express3', ['build', 'install-express3-dependencies'], testFn({framework: 'express3'})
 gulp.task 'test-restify', ['build'], testFn({framework: 'restify'})
 gulp.task 'test-quick', ['test-express4']
