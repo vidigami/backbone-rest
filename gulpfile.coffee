@@ -22,7 +22,7 @@ MOCHA_FRAMEWORK_OPTIONS =
   restify: {require: ['test/parameters_restify', 'backbone-orm/test/parameters'], env: {NODE_ENV: 'test'}}
 
 testFn = (options={}) -> (callback) ->
-  gutil.log "Running tests for #{options.framework}"
+  gutil.log "Running tests for #{options.framework} #{if options.quick then '(quick)' else ''}"
   gulp.src("test/spec/**/*.tests.coffee")
     .pipe(mocha(_.extend({reporter: 'dot'}, MOCHA_FRAMEWORK_OPTIONS[options.framework])))
     .pipe es.writeArray callback
@@ -36,7 +36,7 @@ gulp.task 'install-express3-dependencies', ->
   return gulp.src('test/lib/express3/package.json').pipe(install())
 gulp.task 'test-express3', ['build', 'install-express3-dependencies'], testFn({framework: 'express3'})
 gulp.task 'test-restify', ['build'], testFn({framework: 'restify'})
-gulp.task 'test-quick', ['test-express4']
+gulp.task 'test-quick', ['build'], testFn({framework: 'express4', quick: true})
 
 # gulp.task 'benchmark', ['build'], (callback) ->
 #   (require './test/lib/run_benchmarks')(callback)
