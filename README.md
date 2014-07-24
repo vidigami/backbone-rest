@@ -59,26 +59,27 @@ Please [checkout the website](http://vidigami.github.io/backbone-orm/backbone-re
 To build the library for Node.js:
 
 ```
-$ npm run
+$ gulp build
 ```
 
-Please run tests before submitting a pull request.
+Please run tests before submitting a pull request:
+
+```
+$ gulp test-quick
+```
+
+and eventually all tests:
 
 ```
 $ npm test
 ```
 
-# Test Options
+# Test Variants
 
-To tests, an application framework backend must be defined. Use `mocha --require` on the desired framework loader.
-
-```
-mocha --require test/parameters_express3 test/**/*.tests.coffee
-```
-
-To run specific groups of tests, [use mocha `--grep` option on tags stated in the test descriptions](https://github.com/visionmedia/mocha/wiki/Tagging); for example:
+You can run the following fine-grained tests to resolve problems with specific application frameworks
 
 ```
-mocha --require test/parameters_express3 --grep @cache test/**/*.tests.coffee
+$ gulp test-express3
+$ gulp test-express4
+$ gulp test-restify
 ```
-
