@@ -11,13 +11,10 @@ RestController = require '../../lib/rest_controller'
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
-option_sets = BackboneORM.Utils._getTestOptionSets()
-parameters = __test__parameters if __test__parameters?
-app_framework = __test__app_framework if __test__app_framework?
-_.each option_sets, module.exports = (options) ->
-  options = _.extend({}, options, parameters) if parameters
+_.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
+  options = _.extend({}, options, __test__parameters) if __test__parameters?
+  options.app_framework = __test__app_framework if __test__app_framework?
   return if options.embed and not options.sync.capabilities(options.database_url or '').embed
-  options.app_framework = app_framework if app_framework
 
   DATABASE_URL = options.database_url or ''
   BASE_SCHEMA = options.schema or {}
