@@ -321,6 +321,19 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
             assert.ok(pre_triggered, "Post event trigger: #{post_triggered}")
             done()
 
+      it 'should return an error for an invalid json query', (done) ->
+        app = APP_FACTORY()
+        controller = new RestController(app, {model_type: Flat, route: ROUTE})
+
+        request(app)
+          .get(ROUTE)
+          .type('json')
+          .query(id: '{$in:[4,5]}')
+          .end (err, res) ->
+            assert.ifError(err)
+            assert.ok(res.clientError, "status not 4xx. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+            done()
+
     ######################################
     # show
     ######################################
