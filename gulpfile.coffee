@@ -24,14 +24,13 @@ mocha_framework_options =
 
 testFn = (options={}) -> (callback) ->
   gutil.log "Running tests for #{options.framework}"
-  gulp.src("test/spec/**/*.tests.coffee")
+  return gulp.src("test/spec/**/*.tests.coffee")
     .pipe(mocha(mocha_framework_options[options.framework]))
     .pipe es.writeArray callback
-  return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'test', ['build', 'install-express3-dependencies'], (callback) ->
   Async.series (testFn({framework: framework_name}) for framework_name of mocha_framework_options), callback
-  return
+  return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 gulp.task 'test-express4', ['build'], testFn({framework: 'express4'})
 gulp.task 'install-express3-dependencies', [], ->
   return gulp.src('test/lib/express3/package.json').pipe(install())
