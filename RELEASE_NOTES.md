@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.6.1
+* Bound function calls in _call
+
 ### 0.6.0
 * Update for BackboneORM 0.6.0
 * Ensured all responses sended JSON
