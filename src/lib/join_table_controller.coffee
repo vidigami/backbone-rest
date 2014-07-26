@@ -4,7 +4,7 @@ RestController = require '../rest_controller'
 
 module.exports = class JoinTableController extends RestController
 
-  create: (req, res) =>
+  create: (req, res) ->
     try
       json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
 
