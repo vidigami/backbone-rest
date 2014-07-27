@@ -22,9 +22,11 @@ MOCHA_FRAMEWORK_OPTIONS =
   restify: {require: ['test/parameters_restify', 'backbone-orm/test/parameters'], env: {NODE_ENV: 'test'}}
 
 testFn = (options={}) -> (callback) ->
-  gutil.log "Running tests for #{options.framework} #{if options.quick then '(quick)' else ''}"
+  tags = ("@#{tag.replace(/^[-]+/, '')}" for tag in process.argv.slice(3)).join(' ')
+  gutil.log "Running tests for #{options.framework} #{tags}"
+
   gulp.src("test/spec/**/*.tests.coffee")
-    .pipe(mocha(_.extend({reporter: 'dot'}, MOCHA_FRAMEWORK_OPTIONS[options.framework])))
+    .pipe(mocha(_.extend({reporter: 'dot', grep: tags}, MOCHA_FRAMEWORK_OPTIONS[options.framework])))
     .pipe es.writeArray callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
@@ -32,11 +34,9 @@ gulp.task 'test', ['build', 'install-express3-dependencies'], (callback) ->
   Async.series (testFn({framework: framework_name}) for framework_name of MOCHA_FRAMEWORK_OPTIONS), callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 gulp.task 'test-express4', ['build'], testFn({framework: 'express4'})
-gulp.task 'install-express3-dependencies', ->
-  return gulp.src('test/lib/express3/package.json').pipe(install())
+gulp.task 'install-express3-dependencies', -> return gulp.src('test/lib/express3/package.json').pipe(install())
 gulp.task 'test-express3', ['build', 'install-express3-dependencies'], testFn({framework: 'express3'})
 gulp.task 'test-restify', ['build'], testFn({framework: 'restify'})
-gulp.task 'test-quick', ['build'], testFn({framework: 'express4', quick: true})
 
 # gulp.task 'benchmark', ['build'], (callback) ->
 #   (require './test/lib/run_benchmarks')(callback)
