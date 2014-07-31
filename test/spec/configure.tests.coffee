@@ -153,3 +153,24 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           assert.ok(!err, "No errors: #{err}")
           assert.equal(405, res.status, "Expected: #{405}, Actual: #{res.status}")
           done()
+
+    it 'configure headers', (done) ->
+      app = APP_FACTORY()
+      controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['headByQuery']})
+      RestController.configure({headers: {ETag: '1234'}})
+
+      request(app)
+        .head(ROUTE)
+        .send({stuff: 100})
+        .type('json')
+        .end (err, res) ->
+          assert.ok(!err, "No errors: #{err}")
+          assert.equal(405, res.status, "Expected: #{405}, Actual: #{res.status}")
+
+          assert.equal res.headers.etag, '1234', 'ETag header was returned'
+
+          assert.equal RestController.headers.ETag, '1234', 'ETag header was set'
+          delete RestController.headers.ETag
+          assert.ok _.isUndefined(RestController.headers.ETag), 'ETag header was removed'
+
+          done()

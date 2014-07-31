@@ -4,5 +4,12 @@
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
 ###
 
-module.exports = require './rest_controller'
-module.exports.configure = require './lib/configure'
+{_} = BackboneORM = require 'backbone-orm'
+
+module.exports = BackboneREST = require './core' # avoid circular dependencies
+publish =
+  configure: require './lib/configure'
+_.extend(BackboneREST, publish)
+
+# re-expose modules
+BackboneREST.modules = {'backbone-orm': BackboneORM}

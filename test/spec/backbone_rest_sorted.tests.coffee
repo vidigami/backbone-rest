@@ -6,7 +6,7 @@ BackboneORM = require 'backbone-orm'
 
 request = require 'supertest'
 
-RestController = require '../../lib/rest_controller'
+RestController = require '../../lib/index'
 
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))

@@ -41,7 +41,7 @@ module.exports = class RESTController
     req = res.req
     @constructor.trigger('error', {req: req, res: res, err: err})
     @logger.error("Error 500 from #{req.method} #{req.url}: #{err?.stack or err}")
-    res.header('content-type', 'text/plain'); res.status(500); @sendStatus(res, err.toString())
+    res.status(500); res.json({error: err.toString()})
 
   index: (req, res) ->
     return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
@@ -169,7 +169,7 @@ module.exports = class RESTController
     JSONUtils.renderTemplate models, template, options, callback
 
   setHeaders: (req, res, next) ->
-    res.header('cache-control', 'no-cache')
+    res.setHeader(key, value) for key, value of RESTController.headers
     next()
 
   _reqToCRUD: (req) ->
