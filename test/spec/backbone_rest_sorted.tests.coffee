@@ -70,8 +70,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = MODELS_JSON, actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = MODELS_JSON, actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by single key', (done) ->
@@ -84,8 +84,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by single key respecting whitelist (key included)', (done) ->
@@ -98,8 +98,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, 'name')), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
@@ -112,8 +112,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> []), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> []), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by an array of keys', (done) ->
@@ -126,8 +126,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
@@ -140,8 +140,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> _.pick(item, ['name', 'created_at'])), actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
@@ -154,8 +154,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortO(_.map(MODELS_JSON, (item) -> _.pick(item, ['created_at'])), 'created_at'), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortO(_.map(MODELS_JSON, (item) -> _.pick(item, ['created_at'])), 'created_at'), actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
@@ -168,8 +168,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> {}), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = _.map(MODELS_JSON, (item) -> {}), actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by single key', (done) ->
@@ -182,8 +182,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by single key (in array)', (done) ->
@@ -196,8 +196,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by single key respecting whitelist (key included)', (done) ->
@@ -210,8 +210,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> item['name'])), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by single key respecting whitelist (key excluded)', (done) ->
@@ -224,8 +224,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> null)), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> null)), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by an array of keys', (done) ->
@@ -238,8 +238,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
@@ -252,8 +252,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = JSONUtils.parse(res.body), "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name', 'created_at'])))), actual = JSONUtils.parse(res.body), "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
@@ -266,8 +266,8 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name'])))), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> _.values(_.pick(item, ['name'])))), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
@@ -280,6 +280,6 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
-            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
-            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> [])), actual = res.body, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+            assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
+            assert.deepEqual(expected = sortA(_.map(MODELS_JSON, (item) -> [])), actual = res.body, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
             done()

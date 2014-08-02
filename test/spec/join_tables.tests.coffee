@@ -98,7 +98,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
-          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
           owner_id = JSONUtils.parse(res.body).id
           assert.ok(!!owner_id, 'found owner')
 
@@ -108,10 +108,10 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
             .type('json')
             .end (err, res) ->
               assert.ok(!err, "no errors: #{err}")
-              assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+              assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
               expected = sortO(_.select(MODELS_JSON, (test) -> test.owner_id is owner_id), 'reverse_id')
               actual = sortO(_.map(JSONUtils.parse(res.body), (item) -> _.pick(item, 'owner_id', 'reverse_id')), 'reverse_id')
-              assert.deepEqual(expected, actual, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+              assert.deepEqual(expected, actual, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
 
               reverse_id = actual[0].reverse_id
               request(app)
@@ -120,10 +120,10 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
                 .type('json')
                 .end (err, res) ->
                   assert.ok(!err, "no errors: #{err}")
-                  assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+                  assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
                   expected = sortO(_.select(MODELS_JSON, (test) -> test.reverse_id is reverse_id), 'owner_id')
                   actual = sortO(_.map(JSONUtils.parse(res.body), (item) -> _.pick(item, 'owner_id', 'reverse_id')), 'owner_id')
-                  assert.deepEqual(expected, actual, "Expected: #{util.inspect(expected)}. Actual: #{util.inspect(actual)}")
+                  assert.deepEqual(expected, actual, "Expected: #{JSONUtils.stringify(expected)}. Actual: #{JSONUtils.stringify(actual)}")
                   done()
 
     # TODO: re-enable
@@ -139,13 +139,13 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       send_post (err, res) ->
         assert.ok(!err, "no errors: #{err}")
-        assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+        assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
         owner_id = JSONUtils.parse(res.body).owner_id
         assert.ok(!!owner_id, "found owner_id")
 
         send_post (err, res) ->
           assert.ok(!err, "no errors: #{err}")
-          assert.equal(res.status, 409, "status not 409. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          assert.equal(res.status, 409, "status not 409. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
           done()
 
     it.skip 'Can include related (two-way hasMany) models', (done) ->
@@ -156,7 +156,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
-          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{util.inspect(res.body)}")
+          assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
           owner_id = JSONUtils.parse(res.body).id
           assert.ok(!!owner_id, 'found owner')
 
