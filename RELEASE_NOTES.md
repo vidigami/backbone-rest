@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.6.4
+* Bug fix for shared auths
+
 ### 0.6.3
 * Extended auth to include object methods. Use default or named routes
 * Added METHODS to RestController to ease blocking
