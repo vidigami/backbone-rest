@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.6.3
+* Extended auth to include object methods. Use default or named routes
+* Added METHODS to RestController to ease blocking
+
 ### 0.6.2
 * Added 'Content-Type' header 'application/json' to all responses
 * Added configure method for headers

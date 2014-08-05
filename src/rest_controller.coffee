@@ -10,6 +10,7 @@ path = require 'path'
 JoinTableControllerSingleton = require './lib/join_table_controller_singleton'
 
 module.exports = class RESTController
+  @METHODS: ['show', 'index', 'create', 'update', 'destroy', 'destroyByQuery', 'head', 'headByQuery']
 
   constructor: (app, options={}) ->
     _.extend(@, options)
@@ -187,8 +188,21 @@ module.exports = class RESTController
         when 'DELETE' then return 'destroy'
         when 'HEAD' then return 'head'
 
+  _dynamicAuth: (req, res, next) =>
+    if @auth.hasOwnProperty(crud = @_reqToCRUD(req)) then auth = @auth[crud]
+    else auth = @auth.default
+    return next() unless auth
+    return auth(req, res, next) unless _.isArray(auth)
+
+    index = -1
+    exec = -> if (++index >= auth.length) then next() else auth[index](req, res, exec)
+    exec()
+
   _call: (fn) =>
-    auths = if _.isArray(@auth) then @auth.slice() else if @auth then [@auth] else []
+    auths = []
+    if _.isArray(@auth) then auths = @auth
+    else if _.isFunction(@auth) then auths.push(@auth)
+    else if _.isObject(@auth) then auths.push(@_dynamicAuth)
     auths.push(@setHeaders)
     auths.push (req, res, next) =>
       (return @sendStatus(res, 405) if @_reqToCRUD(req) in @blocked) if @blocked
