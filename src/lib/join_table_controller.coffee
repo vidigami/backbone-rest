@@ -10,7 +10,7 @@ module.exports = class JoinTableController extends RestController
 
       @model_type.exists json, (err, exists) =>
         return @sendError(res, err) if err
-        (res.status(409); return res.send('Entry already exists')) if exists
+        (res.status(409); return res.send({error: 'Entry already exists'})) if exists
 
         model = new @model_type(@model_type::parse(json))
 

@@ -200,7 +200,7 @@ module.exports = class RESTController
 
   _call: (fn) =>
     auths = []
-    if _.isArray(@auth) then auths = @auth.slice(0)
+    if _.isArray(@auth) then auths = @auth.slice(0) # copy so middleware can attach to an instance
     else if _.isFunction(@auth) then auths.push(@auth)
     else if _.isObject(@auth) then auths.push(@_dynamicAuth)
     auths.push(@setHeaders)
