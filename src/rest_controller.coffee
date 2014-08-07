@@ -130,7 +130,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
       @model_type.destroy {id: @requestId(req)}, (err) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:destroy', event_data)
-        @sendStatus(res, 200)
+        res.json({})
 
   destroyByQuery: (req, res) ->
     event_data = {req: req, res: res}
@@ -138,7 +138,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
     @model_type.destroy JSONUtils.parse(req.query, @model_type), (err) =>
       return @sendError(res, err) if err
       @constructor.trigger('post:destroyByQuery', event_data)
-      @sendStatus(res, 200)
+      res.json({})
 
   head: (req, res) ->
     @model_type.exists @requestId(req), (err, exists) =>
