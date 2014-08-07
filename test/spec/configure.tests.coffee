@@ -156,8 +156,9 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
     it 'configure headers', (done) ->
       app = APP_FACTORY()
+      headers = _.clone(RestController.headers)
+      RestController.configure({headers: _.extend({ETag: '1234'}, headers)})
       controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['headByQuery']})
-      RestController.configure({headers: {ETag: '1234'}})
 
       request(app)
         .head(ROUTE)
@@ -170,7 +171,29 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
           assert.equal res.headers.etag, '1234', 'ETag header was returned'
 
           assert.equal RestController.headers.ETag, '1234', 'ETag header was set'
-          delete RestController.headers.ETag
+          RestController.configure({headers: headers})
           assert.ok _.isUndefined(RestController.headers.ETag), 'ETag header was removed'
+
+          done()
+
+    it 'configure headers', (done) ->
+      app = APP_FACTORY()
+      controller = new RestController(app, {model_type: Flat, route: ROUTE, blocked: ['headByQuery']})
+      controller.configure({headers: _.extend({ETag: '1234'}, controller.headers)})
+
+      request(app)
+        .head(ROUTE)
+        .send({stuff: 100})
+        .type('json')
+        .end (err, res) ->
+          assert.ok(!err, "No errors: #{err}")
+          assert.equal(405, res.status, "Expected: #{405}, Actual: #{res.status}")
+
+          assert.equal res.headers.etag, '1234', 'ETag header was returned'
+          assert.equal controller.headers.ETag, '1234', 'ETag header was set'
+
+          assert.ok _.isUndefined(RestController.headers.ETag), 'ETag header was removed'
+          controller.configure({headers: RestController.headers})
+          assert.ok _.isUndefined(controller.headers.ETag), 'ETag header was removed'
 
           done()

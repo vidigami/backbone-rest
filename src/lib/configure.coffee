@@ -5,5 +5,5 @@ BackboneREST = require '../core'
 BackboneREST.headers = {'Cache-Control': 'no-cache', 'Content-Type': 'application/json'}
 
 module.exports = (options) ->
-  _.extend(BackboneREST.headers, options.headers) if options.headers
+  BackboneREST.headers = options.headers if options.headers
   BackboneORM.configure(_.omit(options, 'headers'))

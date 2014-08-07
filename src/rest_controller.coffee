@@ -9,40 +9,31 @@ path = require 'path'
 
 JoinTableControllerSingleton = require './lib/join_table_controller_singleton'
 
-module.exports = class RESTController
+module.exports = class RESTController extends (require './lib/json_controller')
   @METHODS: ['show', 'index', 'create', 'update', 'destroy', 'destroyByQuery', 'head', 'headByQuery']
 
   constructor: (app, options={}) ->
-    _.extend(@, options)
+    super(app, _.defaults({headers: RESTController.headers}, options))
     @white_lists or= {}; @templates or= {}
-    @logger or= console
-
     @route = path.join(@route_prefix, @route) if @route_prefix
 
-    app.get "#{@route}/:id", @_call(@show)
-    app.get @route, @_call(@index)
+    app.get "#{@route}/:id", @wrap(@show)
+    app.get @route, @wrap(@index)
 
-    app.post @route, @_call(@create)
-    app.put "#{@route}/:id", @_call(@update)
+    app.post @route, @wrap(@create)
+    app.put "#{@route}/:id", @wrap(@update)
 
     del = if app.hasOwnProperty('delete') then 'delete' else 'del'
-    app[del] "#{@route}/:id", @_call(@destroy)
-    app[del] @route, @_call(@destroyByQuery)
+    app[del] "#{@route}/:id", @wrap(@destroy)
+    app[del] @route, @wrap(@destroyByQuery)
 
-    app.head "#{@route}/:id", @_call(@head)
-    app.head @route, @_call(@headByQuery)
+    app.head "#{@route}/:id", @wrap(@head)
+    app.head @route, @wrap(@headByQuery)
 
     JoinTableControllerSingleton.generateByOptions(app, options)
 
   requestId: (req) -> JSONUtils.parse({id: req.params.id}, @model_type).id
   requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
-
-  sendStatus: (res, status) -> res.status(status); res.json({})
-  sendError: (res, err) ->
-    req = res.req
-    @constructor.trigger('error', {req: req, res: res, err: err})
-    @logger.error("Error 500 from #{req.method} #{req.url}: #{err?.stack or err}")
-    res.status(500); res.json({error: err.toString()})
 
   index: (req, res) ->
     return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
@@ -168,45 +159,5 @@ module.exports = class RESTController
     options = (if @renderOptions then @renderOptions(req, template_name) else {})
     models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
     JSONUtils.renderTemplate models, template, options, callback
-
-  setHeaders: (req, res, next) ->
-    res.setHeader(key, value) for key, value of RESTController.headers
-    next()
-
-  _reqToCRUD: (req) ->
-    req_path = @requestValue(req, 'path')
-    if req_path is @route
-      switch req.method
-        when 'GET' then return 'index'
-        when 'POST' then return 'create'
-        when 'DELETE' then return 'destroyByQuery'
-        when 'HEAD' then return 'headByQuery'
-    else if @requestId(req) and req_path is "#{@route}/#{@requestId(req)}"
-      switch req.method
-        when 'GET' then  return 'show'
-        when 'PUT' then return 'update'
-        when 'DELETE' then return 'destroy'
-        when 'HEAD' then return 'head'
-
-  _dynamicAuth: (req, res, next) =>
-    if @auth.hasOwnProperty(crud = @_reqToCRUD(req)) then auth = @auth[crud]
-    else auth = @auth.default
-    return next() unless auth
-    return auth(req, res, next) unless _.isArray(auth)
-
-    index = -1
-    exec = -> if (++index >= auth.length) then next() else auth[index](req, res, exec)
-    exec()
-
-  _call: (fn) =>
-    auths = []
-    if _.isArray(@auth) then auths = @auth.slice(0) # copy so middleware can attach to an instance
-    else if _.isFunction(@auth) then auths.push(@auth)
-    else if _.isObject(@auth) then auths.push(@_dynamicAuth)
-    auths.push(@setHeaders)
-    auths.push (req, res, next) =>
-      (return @sendStatus(res, 405) if @_reqToCRUD(req) in @blocked) if @blocked
-      try fn.call(@, req, res, next) catch err then @sendError(res, err)
-    return auths
 
 _.extend(RESTController, Backbone.Events)
