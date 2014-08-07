@@ -12,6 +12,7 @@ module.exports = class JSONController
     @headers or= {'Cache-Control': 'no-cache', 'Content-Type': 'application/json'}
 
   configure: (options={}) -> _.extend(@, options)
+
   sendStatus: (res, status, message) -> res.status(status); if message then res.json({message}) else res.json({})
   sendError: (res, err) ->
     req = res.req
@@ -20,16 +21,18 @@ module.exports = class JSONController
     res.status(500); res.json({error: err.toString()})
 
   wrap: (fn) =>
-    auths = []
-    if _.isArray(@auth) then auths = @auth.slice(0) # copy so middleware can attach to an instance
-    else if _.isFunction(@auth) then auths.push(@auth)
-    else if _.isObject(@auth) then auths.push(@_dynamicAuth)
-    auths.push(@_setHeaders)
-    auths.push (req, res, next) =>
+    stack = []
+    if _.isArray(@auth) then stack = @auth.slice(0) # copy so middleware can attach to an instance
+    else if _.isFunction(@auth) then stack.push(@auth)
+    else if _.isObject(@auth) then stack.push(@_dynamicAuth)
+    stack.push(@_setHeaders)
+    stack.push (req, res, next) =>
       (return @sendStatus(res, 405) if @_reqToCRUD(req) in @blocked) if @blocked
-      try fn.wrap(@, req, res, next) catch err then @sendError(res, err)
-    return auths
-  _wrap: @::wrap # TODO: add deprecation warning
+      try fn.call(@, req, res, next) catch err then @sendError(res, err)
+    return stack
+  _call: @::wrap # TODO: add deprecation warning
+
+  requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
 
   ################################
   # Private

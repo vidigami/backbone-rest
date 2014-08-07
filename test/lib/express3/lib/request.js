@@ -3,6 +3,8 @@
  * Module dependencies.
  */
 
+var auth = require('basic-auth');
+var deprecate = require('depd')('express');
 var http = require('http')
   , utils = require('./utils')
   , connect = require('connect')
@@ -339,7 +341,9 @@ req.is = function(type){
  * Return the protocol string "http" or "https"
  * when requested with TLS. When the "trust proxy"
  * setting trusts the socket address, the
- * "X-Forwarded-Proto" header field will be trusted.
+ * "X-Forwarded-Proto" header field will be trusted
+ * and used if present.
+ *
  * If you're running behind a reverse proxy that
  * supplies https for you this may be enabled.
  *
@@ -348,17 +352,18 @@ req.is = function(type){
  */
 
 req.__defineGetter__('protocol', function(){
+  var proto = this.connection.encrypted
+    ? 'https'
+    : 'http';
   var trust = this.app.get('trust proxy fn');
 
   if (!trust(this.connection.remoteAddress)) {
-    return this.connection.encrypted
-      ? 'https'
-      : 'http';
+    return proto;
   }
 
   // Note: X-Forwarded-Proto is normally only ever a
   //       single value, but this is to be safe.
-  var proto = this.get('X-Forwarded-Proto') || 'http';
+  proto = this.get('X-Forwarded-Proto') || proto;
   return proto.split(/\s*,\s*/)[0];
 });
 
@@ -422,20 +427,13 @@ req.__defineGetter__('ips', function(){
  */
 
 req.__defineGetter__('auth', function(){
-  // missing
-  var auth = this.get('Authorization');
-  if (!auth) return;
-
-  // malformed
-  var parts = auth.split(' ');
-  if ('basic' != parts[0].toLowerCase()) return;
-  if (!parts[1]) return;
-  auth = parts[1];
+  deprecate('req.auth: Use basic-auth npm module instead');
 
   // credentials
-  auth = new Buffer(auth, 'base64').toString().match(/^([^:]*):(.*)$/);
-  if (!auth) return;
-  return { username: auth[1], password: auth[2] };
+  var creds = auth(this);
+  if (!creds) return;
+
+  return { username: creds.name, password: creds.pass };
 });
 
 /**

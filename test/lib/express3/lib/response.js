@@ -2,6 +2,9 @@
  * Module dependencies.
  */
 
+var deprecate = require('depd')('express');
+var escapeHtml = require('escape-html');
+var vary = require('vary');
 var http = require('http')
   , path = require('path')
   , connect = require('connect')
@@ -10,7 +13,6 @@ var http = require('http')
   , normalizeType = require('./utils').normalizeType
   , normalizeTypes = require('./utils').normalizeTypes
   , setCharset = require('./utils').setCharset
-  , deprecate = require('./utils').deprecate
   , statusCodes = http.STATUS_CODES
   , cookie = require('cookie')
   , send = require('send')
@@ -101,13 +103,15 @@ res.send = function(body){
     }
   }
 
+  // disambiguate res.send(status) and res.send(status, num)
+  if (typeof body === 'number' && arguments.length === 1) {
+    // res.send(status) will set status message as text string
+    this.get('Content-Type') || this.type('txt');
+    this.statusCode = body;
+    body = http.STATUS_CODES[body];
+  }
+
   switch (typeof body) {
-    // response status
-    case 'number':
-      this.get('Content-Type') || this.type('txt');
-      this.statusCode = body;
-      body = http.STATUS_CODES[body];
-      break;
     // string defaulting to html
     case 'string':
       if (!this.get('Content-Type')) {
@@ -116,6 +120,7 @@ res.send = function(body){
       }
       break;
     case 'boolean':
+    case 'number':
     case 'object':
       if (null == body) {
         body = '';
@@ -194,9 +199,11 @@ res.json = function(obj){
     // res.json(body, status) backwards compat
     if ('number' == typeof arguments[1]) {
       this.statusCode = arguments[1];
-      return 'number' === typeof obj
-        ? jsonNumDeprecated.call(this, obj)
-        : jsonDeprecated.call(this, obj);
+      if (typeof obj === 'number') {
+        deprecate('res.json(obj, status): Use res.json(status, obj) instead');
+      } else {
+        deprecate('res.json(num, status): Use res.status(status).json(num) instead');
+      }
     } else {
       this.statusCode = obj;
       obj = arguments[1];
@@ -215,12 +222,6 @@ res.json = function(obj){
 
   return this.send(body);
 };
-
-var jsonDeprecated = deprecate(res.json,
-  'res.json(obj, status): Use res.json(status, obj) instead');
-
-var jsonNumDeprecated = deprecate(res.json,
-  'res.json(num, status): Use res.status(status).json(num) instead');
 
 /**
  * Send JSON response with JSONP callback support.
@@ -244,9 +245,11 @@ res.jsonp = function(obj){
     // res.json(body, status) backwards compat
     if ('number' == typeof arguments[1]) {
       this.statusCode = arguments[1];
-      return 'number' === typeof obj
-        ? jsonpNumDeprecated.call(this, obj)
-        : jsonpDeprecated.call(this, obj);
+      if (typeof obj === 'number') {
+        deprecate('res.jsonp(obj, status): Use res.jsonp(status, obj) instead');
+      } else {
+        deprecate('res.jsonp(num, status): Use res.status(status).jsonp(num) instead');
+      }
     } else {
       this.statusCode = obj;
       obj = arguments[1];
@@ -257,14 +260,15 @@ res.jsonp = function(obj){
   var app = this.app;
   var replacer = app.get('json replacer');
   var spaces = app.get('json spaces');
-  var body = JSON.stringify(obj, replacer, spaces)
-    .replace(/\u2028/g, '\\u2028')
-    .replace(/\u2029/g, '\\u2029');
+  var body = JSON.stringify(obj, replacer, spaces);
   var callback = this.req.query[app.get('jsonp callback name')];
 
   // content-type
-  this.charset = this.charset || 'utf-8';
-  this.get('Content-Type') || this.set('Content-Type', 'application/json');
+  if (!this.get('Content-Type')) {
+    this.charset = 'utf-8';
+    this.set('X-Content-Type-Options', 'nosniff');
+    this.set('Content-Type', 'application/json');
+  }
 
   // fixup callback
   if (Array.isArray(callback)) {
@@ -272,20 +276,26 @@ res.jsonp = function(obj){
   }
 
   // jsonp
-  if (callback && 'string' === typeof callback) {
+  if (typeof callback === 'string' && callback.length !== 0) {
+    this.charset = 'utf-8';
+    this.set('X-Content-Type-Options', 'nosniff');
     this.set('Content-Type', 'text/javascript');
-    var cb = callback.replace(/[^\[\]\w$.]/g, '');
-    body = 'typeof ' + cb + ' === \'function\' && ' + cb + '(' + body + ');';
+
+    // restrict callback charset
+    callback = callback.replace(/[^\[\]\w$.]/g, '');
+
+    // replace chars not allowed in JavaScript that are in JSON
+    body = body
+      .replace(/\u2028/g, '\\u2028')
+      .replace(/\u2029/g, '\\u2029');
+
+    // the /**/ is a specific security mitigation for "Rosetta Flash JSONP abuse"
+    // the typeof check is just to reduce client error noise
+    body = '/**/ typeof ' + callback + ' === \'function\' && ' + callback + '(' + body + ');';
   }
 
   return this.send(body);
 };
-
-var jsonpDeprecated = deprecate(res.json,
-  'res.jsonp(obj, status): Use res.jsonp(status, obj) instead');
-
-var jsonpNumDeprecated = deprecate(res.json,
-  'res.jsonp(num, status): Use res.status(status).jsonp(num) instead');
 
 /**
  * Transfer the file at the given `path`.
@@ -298,8 +308,11 @@ var jsonpNumDeprecated = deprecate(res.json,
  *
  * Options:
  *
- *   - `maxAge` defaulting to 0
- *   - `root`   root directory for relative filenames
+ *   - `maxAge`   defaulting to 0
+ *   - `root`     root directory for relative filenames
+ *   - `dotfiles` serve dotfiles, defaulting to false; can be `"allow"` to send them
+ *
+ * Other options are passed along to `send`.
  *
  * Examples:
  *
@@ -375,9 +388,7 @@ res.sendfile = function(path, options, fn){
   }
 
   // transfer
-  var file = send(req, path);
-  if (options.root) file.root(options.root);
-  file.maxage(options.maxAge || 0);
+  var file = send(req, path, options);
   file.on('error', error);
   file.on('directory', next);
   file.on('stream', stream);
@@ -710,11 +721,8 @@ res.location = function(url){
  *    res.redirect('/foo/bar');
  *    res.redirect('http://example.com');
  *    res.redirect(301, 'http://example.com');
- *    res.redirect('http://example.com', 301);
  *    res.redirect('../login'); // /blog/post/1 -> /blog/login
  *
- * @param {String} url
- * @param {Number} code
  * @api public
  */
 
@@ -729,6 +737,7 @@ res.redirect = function(url){
       status = url;
       url = arguments[1];
     } else {
+      deprecate('res.redirect(ur, status): Use res.redirect(status, url) instead');
       status = arguments[1];
     }
   }
@@ -744,7 +753,7 @@ res.redirect = function(url){
     },
 
     html: function(){
-      var u = utils.escape(url);
+      var u = escapeHtml(url);
       body = '<p>' + statusCodes[status] + '. Redirecting to <a href="' + u + '">' + u + '</a></p>';
     },
 
@@ -769,31 +778,12 @@ res.redirect = function(url){
  */
 
 res.vary = function(field){
-  var self = this;
-
-  // nothing
+  // checks for back-compat
   if (!field) return this;
+  if (Array.isArray(field) && !field.length) return this;
 
-  // array
-  if (Array.isArray(field)) {
-    field.forEach(function(field){
-      self.vary(field);
-    });
-    return;
-  }
+  vary(this, field);
 
-  var vary = this.get('Vary');
-
-  // append
-  if (vary) {
-    vary = vary.split(/ *, */);
-    if (!~vary.indexOf(field)) vary.push(field);
-    this.set('Vary', vary.join(', '));
-    return this;
-  }
-
-  // set
-  this.set('Vary', field);
   return this;
 };
 

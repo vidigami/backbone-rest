@@ -4,45 +4,16 @@
  */
 
 var mime = require('connect').mime
-  , deprecate = require('util').deprecate
   , proxyaddr = require('proxy-addr')
   , crc32 = require('buffer-crc32')
   , crypto = require('crypto');
+var typer = require('media-typer');
 
 /**
  * toString ref.
  */
 
 var toString = {}.toString;
-
-/**
- * Simple detection of charset parameter in content-type
- */
-var charsetRegExp = /;\s*charset\s*=/;
-
-/**
- * Deprecate function, like core `util.deprecate`,
- * but with NODE_ENV and color support.
- *
- * @param {Function} fn
- * @param {String} msg
- * @return {Function}
- * @api private
- */
-
-exports.deprecate = function(fn, msg){
-  if (process.env.NODE_ENV === 'test') return fn;
-
-  // prepend module name
-  msg = 'express: ' + msg;
-
-  if (process.stderr.isTTY) {
-    // colorize
-    msg = '\x1b[31;1m' + msg + '\x1b[0m';
-  }
-
-  return deprecate(fn, msg);
-};
 
 /**
  * Return strong ETag for `body`.
@@ -323,22 +294,6 @@ function acceptParams(str, index) {
 }
 
 /**
- * Escape special characters in the given string of html.
- *
- * @param  {String} html
- * @return {String}
- * @api private
- */
-
-exports.escape = function(html) {
-  return String(html)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-};
-
-/**
  * Normalize the given path string,
  * returning a regular expression.
  *
@@ -452,21 +407,12 @@ exports.compileTrust = function(val) {
 exports.setCharset = function(type, charset){
   if (!type || !charset) return type;
 
-  var exists = charsetRegExp.test(type);
+  // parse type
+  var parsed = typer.parse(type);
 
-  // removing existing charset
-  if (exists) {
-    var parts = type.split(';');
+  // set charset
+  parsed.parameters.charset = charset;
 
-    for (var i = 1; i < parts.length; i++) {
-      if (charsetRegExp.test(';' + parts[i])) {
-        parts.splice(i, 1);
-        break;
-      }
-    }
-
-    type = parts.join(';');
-  }
-
-  return type + '; charset=' + charset;
+  // format type
+  return typer.format(parsed);
 };

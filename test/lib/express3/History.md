@@ -1,3 +1,251 @@
+3.16.1 / 2014-08-06
+===================
+
+  * deps: connect@2.25.1
+    - deps: body-parser@~1.6.1
+    - deps: qs@1.1.0
+
+3.16.0 / 2014-08-05
+===================
+
+  * deps: connect@2.25.0
+    - deps: body-parser@~1.6.0
+    - deps: compression@~1.0.10
+    - deps: csurf@~1.4.0
+    - deps: express-session@~1.7.4
+    - deps: qs@1.0.2
+    - deps: serve-static@~1.5.0
+  * deps: send@0.8.1
+    - Add `extensions` option
+
+3.15.3 / 2014-08-04
+===================
+
+  * fix `res.sendfile` regression for serving directory index files
+  * deps: connect@2.24.3
+    - deps: serve-index@~1.1.5
+    - deps: serve-static@~1.4.4
+  * deps: send@0.7.4
+    - Fix incorrect 403 on Windows and Node.js 0.11
+    - Fix serving index files without root dir
+
+3.15.2 / 2014-07-27
+===================
+
+  * deps: connect@2.24.2
+    - deps: body-parser@~1.5.2
+    - deps: depd@0.4.4
+    - deps: express-session@~1.7.2
+    - deps: morgan@~1.2.2
+    - deps: serve-static@~1.4.2
+  * deps: depd@0.4.4
+    - Work-around v8 generating empty stack traces
+  * deps: send@0.7.2
+    - deps: depd@0.4.4
+
+3.15.1 / 2014-07-26
+===================
+
+  * deps: connect@2.24.1
+    - deps: body-parser@~1.5.1
+    - deps: depd@0.4.3
+    - deps: express-session@~1.7.1
+    - deps: morgan@~1.2.1
+    - deps: serve-index@~1.1.4
+    - deps: serve-static@~1.4.1
+  * deps: depd@0.4.3
+    - Fix exception when global `Error.stackTraceLimit` is too low
+  * deps: send@0.7.1
+    - deps: depd@0.4.3
+
+3.15.0 / 2014-07-22
+===================
+
+  * Fix `req.protocol` for proxy-direct connections
+  * Pass options from `res.sendfile` to `send`
+  * deps: connect@2.24.0
+    - deps: body-parser@~1.5.0
+    - deps: compression@~1.0.9
+    - deps: connect-timeout@~1.2.1
+    - deps: debug@1.0.4
+    - deps: depd@0.4.2
+    - deps: express-session@~1.7.0
+    - deps: finalhandler@0.1.0
+    - deps: method-override@~2.1.2
+    - deps: morgan@~1.2.0
+    - deps: multiparty@3.3.1
+    - deps: parseurl@~1.2.0
+    - deps: serve-static@~1.4.0
+  * deps: debug@1.0.4
+  * deps: depd@0.4.2
+    - Add `TRACE_DEPRECATION` environment variable
+    - Remove non-standard grey color from color output
+    - Support `--no-deprecation` argument
+    - Support `--trace-deprecation` argument
+  * deps: parseurl@~1.2.0
+    - Cache URLs based on original value
+    - Remove no-longer-needed URL mis-parse work-around
+    - Simplify the "fast-path" `RegExp`
+  * deps: send@0.7.0
+    - Add `dotfiles` option
+    - Cap `maxAge` value to 1 year
+    - deps: debug@1.0.4
+    - deps: depd@0.4.2
+
+3.14.0 / 2014-07-11
+===================
+
+ * add explicit "Rosetta Flash JSONP abuse" protection
+   - previous versions are not vulnerable; this is just explicit protection
+ * deprecate `res.redirect(url, status)` -- use `res.redirect(status, url)` instead
+ * fix `res.send(status, num)` to send `num` as json (not error)
+ * remove unnecessary escaping when `res.jsonp` returns JSON response
+ * deps: basic-auth@1.0.0
+   - support empty password
+   - support empty username
+ * deps: connect@2.23.0
+   - deps: debug@1.0.3
+   - deps: express-session@~1.6.4
+   - deps: method-override@~2.1.0
+   - deps: parseurl@~1.1.3
+   - deps: serve-static@~1.3.1
+  * deps: debug@1.0.3
+    - Add support for multiple wildcards in namespaces
+  * deps: methods@1.1.0
+    - add `CONNECT`
+  * deps: parseurl@~1.1.3
+    - faster parsing of href-only URLs
+
+3.13.0 / 2014-07-03
+===================
+
+ * add deprecation message to `app.configure`
+ * add deprecation message to `req.auth`
+ * use `basic-auth` to parse `Authorization` header
+ * deps: connect@2.22.0
+   - deps: csurf@~1.3.0
+   - deps: express-session@~1.6.1
+   - deps: multiparty@3.3.0
+   - deps: serve-static@~1.3.0
+ * deps: send@0.5.0
+   - Accept string for `maxage` (converted by `ms`)
+   - Include link in default redirect response
+
+3.12.1 / 2014-06-26
+===================
+
+ * deps: connect@2.21.1
+   - deps: cookie-parser@1.3.2
+   - deps: cookie-signature@1.0.4
+   - deps: express-session@~1.5.2
+   - deps: type-is@~1.3.2
+ * deps: cookie-signature@1.0.4
+   - fix for timing attacks
+
+3.12.0 / 2014-06-21
+===================
+
+ * use `media-typer` to alter content-type charset
+ * deps: connect@2.21.0
+   - deprecate `connect(middleware)` -- use `app.use(middleware)` instead
+   - deprecate `connect.createServer()` -- use `connect()` instead
+   - fix `res.setHeader()` patch to work with with get -> append -> set pattern
+   - deps: compression@~1.0.8
+   - deps: errorhandler@~1.1.1
+   - deps: express-session@~1.5.0
+   - deps: serve-index@~1.1.3
+
+3.11.0 / 2014-06-19
+===================
+
+ * deprecate things with `depd` module
+ * deps: buffer-crc32@0.2.3
+ * deps: connect@2.20.2
+   - deprecate `verify` option to `json` -- use `body-parser` npm module instead
+   - deprecate `verify` option to `urlencoded` -- use `body-parser` npm module instead
+   - deprecate things with `depd` module
+   - use `finalhandler` for final response handling
+   - use `media-typer` to parse `content-type` for charset
+   - deps: body-parser@1.4.3
+   - deps: connect-timeout@1.1.1
+   - deps: cookie-parser@1.3.1
+   - deps: csurf@1.2.2
+   - deps: errorhandler@1.1.0
+   - deps: express-session@1.4.0
+   - deps: multiparty@3.2.9
+   - deps: serve-index@1.1.2
+   - deps: type-is@1.3.1
+   - deps: vhost@2.0.0
+
+3.10.5 / 2014-06-11
+===================
+
+ * deps: connect@2.19.6
+   - deps: body-parser@1.3.1
+   - deps: compression@1.0.7
+   - deps: debug@1.0.2
+   - deps: serve-index@1.1.1
+   - deps: serve-static@1.2.3
+ * deps: debug@1.0.2
+ * deps: send@0.4.3
+   - Do not throw un-catchable error on file open race condition
+   - Use `escape-html` for HTML escaping
+   - deps: debug@1.0.2
+   - deps: finished@1.2.2
+   - deps: fresh@0.2.2
+
+3.10.4 / 2014-06-09
+===================
+
+ * deps: connect@2.19.5
+   - fix "event emitter leak" warnings
+   - deps: csurf@1.2.1
+   - deps: debug@1.0.1
+   - deps: serve-static@1.2.2
+   - deps: type-is@1.2.1
+ * deps: debug@1.0.1
+ * deps: send@0.4.2
+   - fix "event emitter leak" warnings
+   - deps: finished@1.2.1
+   - deps: debug@1.0.1
+
+3.10.3 / 2014-06-05
+===================
+
+ * use `vary` module for `res.vary`
+ * deps: connect@2.19.4
+   - deps: errorhandler@1.0.2
+   - deps: method-override@2.0.2
+   - deps: serve-favicon@2.0.1
+ * deps: debug@1.0.0
+
+3.10.2 / 2014-06-03
+===================
+
+ * deps: connect@2.19.3
+   - deps: compression@1.0.6
+
+3.10.1 / 2014-06-03
+===================
+
+ * deps: connect@2.19.2
+   - deps: compression@1.0.4
+ * deps: proxy-addr@1.0.1
+
+3.10.0 / 2014-06-02
+===================
+
+ * deps: connect@2.19.1
+   - deprecate `methodOverride()` -- use `method-override` npm module instead
+   - deps: body-parser@1.3.0
+   - deps: method-override@2.0.1
+   - deps: multiparty@3.2.8
+   - deps: response-time@2.0.0
+   - deps: serve-static@1.2.1
+ * deps: methods@1.0.1
+ * deps: send@0.4.1
+   - Send `max-age` in `Cache-Control` in correct format
+
 3.9.0 / 2014-05-30
 ==================
 

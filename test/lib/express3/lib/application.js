@@ -12,8 +12,8 @@ var connect = require('connect')
   , compileTrust = require('./utils').compileTrust
   , View = require('./view')
   , utils = connect.utils
-  , deprecate = require('./utils').deprecate
   , http = require('http');
+var deprecate = require('depd')('express');
 
 /**
  * Application prototype.
@@ -48,10 +48,12 @@ app.defaultConfiguration = function(){
   // default settings
   this.enable('x-powered-by');
   this.set('etag', 'weak');
-  this.set('env', process.env.NODE_ENV || 'development');
+  var env = process.env.NODE_ENV || 'development';
+  this.set('env', env);
   this.set('subdomain offset', 2);
   this.set('trust proxy', false);
-  debug('booting in %s mode', this.get('env'));
+
+  debug('booting in %s mode', env);
 
   // implicit middleware
   this.use(connect.query());
@@ -86,13 +88,13 @@ app.defaultConfiguration = function(){
   this.set('views', process.cwd() + '/views');
   this.set('jsonp callback name', 'callback');
 
-  this.configure('development', function(){
+  if (env === 'development') {
     this.set('json spaces', 2);
-  });
+  }
 
-  this.configure('production', function(){
+  if (env === 'production') {
     this.enable('view cache');
-  });
+  }
 };
 
 /**
@@ -411,6 +413,9 @@ app.configure = function(env, fn){
   return this;
 };
 
+app.configure = deprecate.function(app.configure,
+  'app.configure: Check app.get(\'env\') in an if statement');
+
 /**
  * Delegate `.VERB(...)` calls to `router.VERB(...)`.
  */
@@ -448,7 +453,7 @@ app.all = function(path){
 
 // del -> delete alias
 
-app.del = deprecate(app.delete, 'app.del: Use app.delete instead');
+app.del = deprecate.function(app.delete, 'app.del: Use app.delete instead');
 
 /**
  * Render the given view `name` name with `options`

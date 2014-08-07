@@ -11,7 +11,7 @@ RestController = require '../../lib/rest_controller'
 sortO = (array, field) -> _.sortBy(array, (obj) -> JSON.stringify(obj[field]))
 sortA = (array) -> _.sortBy(array, (item) -> JSON.stringify(item))
 
-_.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
+_.each [BackboneORM.TestUtils.optionSets()[0]], exports = (options) ->
   options = _.extend({}, options, __test__parameters) if __test__parameters?
   options.app_framework = __test__app_framework if __test__app_framework?
   return if options.embed and not options.sync.capabilities(options.database_url or '').embed

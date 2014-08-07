@@ -17,8 +17,8 @@ module.exports = class RESTController extends (require './lib/json_controller')
     @white_lists or= {}; @templates or= {}
     @route = path.join(@route_prefix, @route) if @route_prefix
 
-    app.get "#{@route}/:id", @wrap(@show)
     app.get @route, @wrap(@index)
+    app.get "#{@route}/:id", @wrap(@show)
 
     app.post @route, @wrap(@create)
     app.put "#{@route}/:id", @wrap(@update)
@@ -33,7 +33,6 @@ module.exports = class RESTController extends (require './lib/json_controller')
     JoinTableControllerSingleton.generateByOptions(app, options)
 
   requestId: (req) -> JSONUtils.parse({id: req.params.id}, @model_type).id
-  requestValue: (req, key) -> return if _.isFunction(req[key]) then req[key]() else req[key]
 
   index: (req, res) ->
     return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
