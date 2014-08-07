@@ -10,6 +10,7 @@ module.exports = class JSONController
   constructor: (app, options={}) ->
     @configure(options)
     @headers or= {'Cache-Control': 'no-cache', 'Content-Type': 'application/json'}
+    @logger or= console
 
   configure: (options={}) -> _.extend(@, options)
 

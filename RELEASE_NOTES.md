@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.6.6
+* Bug fix for JSONController missing default logger
+
 ### 0.6.5
 * Split out RestController generic functionality into JSONController
 * Add alias for _call to wrap. _call will be deprecated.
