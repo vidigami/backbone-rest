@@ -5,6 +5,7 @@
 ###
 
 _ = require 'underscore'
+BackboneEvents = (require 'backbone').Events
 
 module.exports = class JSONController
   constructor: (app, options={}) ->
@@ -66,3 +67,5 @@ module.exports = class JSONController
     index = -1
     exec = -> if (++index >= auth.length) then next() else auth[index](req, res, exec)
     exec()
+
+_.extend(JSONController, BackboneEvents)
