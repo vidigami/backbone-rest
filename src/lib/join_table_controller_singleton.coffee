@@ -40,7 +40,7 @@ class JoinTableControllerSingleton
       continue if @join_tables[join_table_options.route] # already exists
       delete join_table_options[_key] for _key in ['white_lists', 'templates', 'default_template']
       join_table_options.model_type = relation.join_table
-      join_table_options.auth = join_table_auth if join_table_auth = options.auth.relations?[key]
+      join_table_options.auth = join_table_auth if join_table_auth = options.auth?.relations?[key]
       # console.log "Generating join table controller at #{join_table_options.route}"
       @join_tables[join_table_options.route] = new JoinTableController(app, join_table_options)
 
