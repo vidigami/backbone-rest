@@ -158,5 +158,3 @@ module.exports = class RESTController extends (require './lib/json_controller')
     options = (if @renderOptions then @renderOptions(req, template_name) else {})
     models = if _.isArray(json) then _.map(json, (model_json) => new @model_type(@model_type::parse(model_json))) else new @model_type(@model_type::parse(json))
     JSONUtils.renderTemplate models, template, options, callback
-
-_.extend(RESTController, Backbone.Events)

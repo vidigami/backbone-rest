@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.6.7
+* Pass auth from options.auth.relations[key] to join table controllers when defined for individual access
+* Mixin Backbone.Events into base JSONController
+
 ### 0.6.6
 * Bug fix for JSONController missing default logger
 
