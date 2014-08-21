@@ -1,6 +1,6 @@
 {
   "name": "backbone-rest",
-  "version": "0.6.7",
+  "version": "0.7.0",
   "description": "A RESTful controller for BackboneORM",
   "main": "./lib/index.js",
   "license": "MIT",
@@ -48,6 +48,6 @@
   "dependencies": {
     "underscore": "1.6.x",
     "backbone": "1.1.x",
-    "backbone-orm": "git+https://github.com/vidigami/backbone-orm#develop"
+    "backbone-orm": "0.7.x"
   }
 }

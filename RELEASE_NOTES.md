@@ -1,7 +1,7 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
 ### 0.7.0
-* Update for BackboneORM 0.7.x
+* Upgrade to BackboneORM 0.7.x
 * Renamed white_lists option to whitelist
 
 ### 0.6.7
