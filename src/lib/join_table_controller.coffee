@@ -6,7 +6,7 @@ module.exports = class JoinTableController extends RestController
 
   create: (req, res) ->
     try
-      json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
+      json = JSONUtils.parseDates(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
 
       @model_type.exists json, (err, exists) =>
         return @sendError(res, err) if err

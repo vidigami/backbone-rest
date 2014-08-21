@@ -32,7 +32,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
 
     JoinTableControllerSingleton.generateByOptions(app, options)
 
-  requestId: (req) -> JSONUtils.parse({id: req.params.id}, @model_type).id
+  requestId: (req) -> JSONUtils.parseField(req.params.id, @model_type, 'id')
 
   index: (req, res) ->
     return @headByQuery.apply(@, arguments) if req.method is 'HEAD' # Express4
@@ -40,7 +40,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
     event_data = {req: req, res: res}
     @constructor.trigger('pre:index', event_data)
 
-    cursor = @model_type.cursor(JSONUtils.parse(req.query, @model_type))
+    cursor = @model_type.cursor(JSONUtils.parseQuery(req.query))
     cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
@@ -83,7 +83,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
         res.json(json)
 
   create: (req, res) ->
-    json = JSONUtils.parse(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
+    json = JSONUtils.parseDates(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
     model = new @model_type(@model_type::parse(json))
 
     event_data = {req: req, res: res, model: model}
@@ -100,7 +100,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
         res.json(json)
 
   update: (req, res) ->
-    json = JSONUtils.parse(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
+    json = JSONUtils.parseDates(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
 
     @model_type.find @requestId(req), (err, model) =>
       return @sendError(res, err) if err
@@ -135,7 +135,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
   destroyByQuery: (req, res) ->
     event_data = {req: req, res: res}
     @constructor.trigger('pre:destroyByQuery', event_data)
-    @model_type.destroy JSONUtils.parse(req.query, @model_type), (err) =>
+    @model_type.destroy JSONUtils.parseQuery(req.query), (err) =>
       return @sendError(res, err) if err
       @constructor.trigger('post:destroyByQuery', event_data)
       res.json({})
@@ -146,7 +146,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
       @sendStatus(res, if exists then 200 else 404)
 
   headByQuery: (req, res) ->
-    @model_type.exists JSONUtils.parse(req.query, @model_type), (err, exists) =>
+    @model_type.exists JSONUtils.parseQuery(req.query), (err, exists) =>
       return @sendError(res, err) if err
       @sendStatus(res, if exists then 200 else 404)
 

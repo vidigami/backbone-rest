@@ -52,7 +52,7 @@ _.each [BackboneORM.TestUtils.optionSets()[0]], exports = (options) ->
 
           Flat.find {$ids: _.pluck(models, 'id')}, (err, models) -> # reload models in case they are stored with different date precision
             return callback(err) if err
-            MODELS_JSON = JSONUtils.parse(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
+            MODELS_JSON = JSONUtils.parseDates(sortO(_.map(models, (test) -> test.toJSON()), 'name')) # need to sort because not sure what order will come back from database
             callback()
 
     it 'Function auth (pass through)', (done) ->

@@ -80,7 +80,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: 'name'})
+          .query(JSONUtils.querify({$select: 'name'}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -94,7 +94,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: 'name'})
+          .query(JSONUtils.querify({$select: 'name'}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -108,7 +108,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: 'name'})
+          .query(JSONUtils.querify({$select: 'name'}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -122,7 +122,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: ['name', 'created_at']})
+          .query(JSONUtils.querify({$select: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -136,7 +136,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: ['name', 'created_at']})
+          .query(JSONUtils.querify({$select: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -150,7 +150,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: ['name', 'created_at']})
+          .query(JSONUtils.querify({$select: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -164,7 +164,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$select: ['name', 'created_at']})
+          .query(JSONUtils.querify({$select: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -178,7 +178,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: 'name'})
+          .query(JSONUtils.querify({$values: 'name'}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -192,7 +192,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
         .get(ROUTE)
-        .query({$values: 'name'})
+        .query(JSONUtils.querify({$values: 'name'}))
         .type('json')
         .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -206,7 +206,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: ['name']})
+          .query(JSONUtils.querify({$values: ['name']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -220,7 +220,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: 'name'})
+          .query(JSONUtils.querify({$values: 'name'}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -234,7 +234,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: 'name'})
+          .query(JSONUtils.querify({$values: 'name'}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -248,7 +248,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: ['name', 'created_at']})
+          .query(JSONUtils.querify({$values: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -262,7 +262,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: ['name', 'created_at']})
+          .query(JSONUtils.querify({$values: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -276,7 +276,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: ['name', 'created_at']})
+          .query(JSONUtils.querify({$values: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -290,7 +290,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$values: ['name', 'created_at']})
+          .query(JSONUtils.querify({$values: ['name', 'created_at']}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
@@ -581,7 +581,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
         id = MODELS_JSON[1].id
         request(app)
           .get("#{ROUTE}")
-          .query({id: id, $exists: ''})
+          .query(JSONUtils.querify({id: id, $exists: ''}))
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
@@ -597,7 +597,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
                 # check again
                 request(app)
                   .get("#{ROUTE}")
-                  .query({id: id, $exists: ''})
+                  .query(JSONUtils.querify({id: id, $exists: ''}))
                   .end (err, res) ->
                     assert.ok(!err, "no errors: #{err}")
                     assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
@@ -612,7 +612,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
         name = MODELS_JSON[1].name
         request(app)
           .head("#{ROUTE}")
-          .query({name: name})
+          .query(JSONUtils.querify({name: name}))
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
@@ -627,7 +627,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
                 # check again
                 request(app)
                   .head("#{ROUTE}")
-                  .query({name: name})
+                  .query(JSONUtils.querify({name: name}))
                   .end (err, res) ->
                     assert.ok(!err, "no errors: #{err}")
                     assert.equal(res.status, 404, "status not 404. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
@@ -641,7 +641,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
         name = MODELS_JSON[1].name
         request(app)
           .get("#{ROUTE}")
-          .query({name: name, $exists: ''})
+          .query(JSONUtils.querify({name: name, $exists: ''}))
           .end (err, res) ->
             assert.ok(!err, "no errors: #{err}")
             assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")
@@ -657,7 +657,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
                 # check again
                 request(app)
                   .get("#{ROUTE}")
-                  .query({name: name, $exists: ''})
+                  .query(JSONUtils.querify({name: name, $exists: ''}))
                   .end (err, res) ->
                     assert.ok(!err, "no errors: #{err}")
                     assert.equal(res.status, 200, "status not 200. Status: #{res.status}. Body: #{JSONUtils.stringify(res.body)}")

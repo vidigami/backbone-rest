@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.7.0
+* Update for BackboneORM 0.7.x
+
 ### 0.6.7
 * Pass auth from options.auth.relations[key] to join table controllers when defined for individual access
 * Mixin Backbone.Events into base JSONController

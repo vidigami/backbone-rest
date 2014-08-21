@@ -25,7 +25,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
   MODELS_JSON = null
   ROUTE = '/test/flats'
 
-  describe "RestController (page: true, #{options.$tags}, framework: #{options.app_framework.name})", ->
+  describe "RestController (page: true, #{options.$tags}, framework: #{options.app_framework.name}) @page", ->
     Flat = null
     before ->
       BackboneORM.configure {model_cache: {enabled: !!options.cache, max: 100}}
@@ -63,7 +63,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       request(app)
         .get(ROUTE)
-        .query({$page: true, $limit: LIMIT})
+        .query(JSONUtils.querify({$page: true, $limit: LIMIT}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
@@ -98,7 +98,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       request(app)
         .get(ROUTE)
-        .query({$page: false, $limit: LIMIT})
+        .query(JSONUtils.querify({$page: false, $limit: LIMIT}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
@@ -114,7 +114,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       request(app)
         .get(ROUTE)
-        .query({$page: true, $limit: LIMIT, $offset: OFFSET})
+        .query(JSONUtils.querify({$page: true, $limit: LIMIT, $offset: OFFSET}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
@@ -132,7 +132,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       request(app)
         .get(ROUTE)
-        .query({$page: true, $select: FIELD_NAMES})
+        .query(JSONUtils.querify({$page: true, $select: FIELD_NAMES}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
@@ -149,7 +149,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       request(app)
         .get(ROUTE)
-        .query({$page: true, $values: FIELD_NAMES})
+        .query(JSONUtils.querify({$page: true, $values: FIELD_NAMES}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "No errors: #{err}")
@@ -170,7 +170,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
         request(app)
           .get(ROUTE)
-          .query({$page: true, name: model.get('name')})
+          .query(JSONUtils.querify({$page: true, name: model.get('name')}))
           .type('json')
           .end (err, res) ->
             assert.ok(!err, "No errors: #{err}")

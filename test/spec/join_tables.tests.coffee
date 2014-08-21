@@ -94,7 +94,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
       app = mockApp()
       request(app)
         .get(OWNER_ROUTE)
-        .query({$one: true})
+        .query(JSONUtils.querify({$one: true}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
@@ -104,7 +104,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
           request(app)
             .get(JOIN_TABLE_ROUTE)
-            .query({owner_id: owner_id})
+            .query(JSONUtils.querify({owner_id: owner_id}))
             .type('json')
             .end (err, res) ->
               assert.ok(!err, "no errors: #{err}")
@@ -116,7 +116,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
               reverse_id = actual[0].reverse_id
               request(app)
                 .get(JOIN_TABLE_ROUTE)
-                .query({reverse_id: reverse_id})
+                .query(JSONUtils.querify({reverse_id: reverse_id}))
                 .type('json')
                 .end (err, res) ->
                   assert.ok(!err, "no errors: #{err}")
@@ -152,7 +152,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
       app = mockApp()
       request(app)
         .get(OWNER_ROUTE)
-        .query({$one: true, $include: 'reverses'})
+        .query(JSONUtils.querify({$one: true, $include: 'reverses'}))
         .type('json')
         .end (err, res) ->
           assert.ok(!err, "no errors: #{err}")
