@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.7.1
+* Bug fix for quoted template names
+
 ### 0.7.0
 * Upgrade to BackboneORM 0.7.x
 * Renamed white_lists option to whitelist

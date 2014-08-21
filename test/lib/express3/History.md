@@ -86,7 +86,7 @@
     - Cache URLs based on original value
     - Remove no-longer-needed URL mis-parse work-around
     - Simplify the "fast-path" `RegExp`
-  * deps: send@0.7.0
+  * deps: send@0.7.1
     - Add `dotfiles` option
     - Cap `maxAge` value to 1 year
     - deps: debug@1.0.4
@@ -1505,7 +1505,7 @@ Shaw]
   * Changed; Express now using submodules again until a PM is adopted
   * Changed; chat example using millisecond conversions from ext
 
-0.7.0 / 2010-03-15
+0.7.1 / 2010-03-15
 ==================
 
   * Added Request#pass() support (finds the next matching route, or the given path)

@@ -153,6 +153,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
   render: (req, json, callback) ->
     template_name = req.query.$render or req.query.$template or @default_template
     return callback(null, json) unless template_name
+    try template_name = JSON.parse(template_name) # remove double quotes
     return callback(new Error "Unrecognized template: #{template_name}") unless template = @templates[template_name]
 
     options = (if @renderOptions then @renderOptions(req, template_name) else {})
