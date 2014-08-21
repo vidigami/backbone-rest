@@ -14,7 +14,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
 
   constructor: (app, options={}) ->
     super(app, _.defaults({headers: RESTController.headers}, options))
-    @white_lists or= {}; @templates or= {}
+    @whitelists or= {}; @templates or= {}
     @route = path.join(@route_prefix, @route) if @route_prefix
 
     app.get @route, @wrap(@index)
@@ -41,7 +41,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
     @constructor.trigger('pre:index', event_data)
 
     cursor = @model_type.cursor(JSONUtils.parseQuery(req.query))
-    cursor = cursor.whiteList(@white_lists.index) if @white_lists.index
+    cursor = cursor.whiteList(@whitelists.index) if @whitelists.index
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
 
@@ -71,11 +71,11 @@ module.exports = class RESTController extends (require './lib/json_controller')
     @constructor.trigger('pre:show', event_data)
 
     cursor = @model_type.cursor(@requestId(req))
-    cursor = cursor.whiteList(@white_lists.show) if @white_lists.show
+    cursor = cursor.whiteList(@whitelists.show) if @whitelists.show
     cursor.toJSON (err, json) =>
       return @sendError(res, err) if err
       return @sendStatus(res, 404) unless json
-      json = _.pick(json, @white_lists.show) if @white_lists.show
+      json = _.pick(json, @whitelists.show) if @whitelists.show
 
       @constructor.trigger('post:show', _.extend(event_data, {json: json}))
       @render req, json, (err, json) =>
@@ -83,7 +83,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
         res.json(json)
 
   create: (req, res) ->
-    json = JSONUtils.parseDates(if @white_lists.create then _.pick(req.body, @white_lists.create) else req.body)
+    json = JSONUtils.parseDates(if @whitelists.create then _.pick(req.body, @whitelists.create) else req.body)
     model = new @model_type(@model_type::parse(json))
 
     event_data = {req: req, res: res, model: model}
@@ -93,14 +93,14 @@ module.exports = class RESTController extends (require './lib/json_controller')
       return @sendError(res, err) if err
 
       event_data.model = model
-      json = if @white_lists.create then _.pick(model.toJSON(), @white_lists.create) else model.toJSON()
+      json = if @whitelists.create then _.pick(model.toJSON(), @whitelists.create) else model.toJSON()
       @render req, json, (err, json) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:create', _.extend(event_data, {json: json}))
         res.json(json)
 
   update: (req, res) ->
-    json = JSONUtils.parseDates(if @white_lists.update then _.pick(req.body, @white_lists.update) else req.body)
+    json = JSONUtils.parseDates(if @whitelists.update then _.pick(req.body, @whitelists.update) else req.body)
 
     @model_type.find @requestId(req), (err, model) =>
       return @sendError(res, err) if err
@@ -113,7 +113,7 @@ module.exports = class RESTController extends (require './lib/json_controller')
         return @sendError(res, err) if err
 
         event_data.model = model
-        json = if @white_lists.update then _.pick(model.toJSON(), @white_lists.update) else model.toJSON()
+        json = if @whitelists.update then _.pick(model.toJSON(), @whitelists.update) else model.toJSON()
         @render req, json, (err, json) =>
           return @sendError(res, err) if err
           @constructor.trigger('post:update', _.extend(event_data, {json: json}))

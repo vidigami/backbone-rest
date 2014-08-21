@@ -2,6 +2,7 @@ Please refer to the following release notes when upgrading your version of Backb
 
 ### 0.7.0
 * Update for BackboneORM 0.7.x
+* Renamed white_lists option to whitelist
 
 ### 0.6.7
 * Pass auth from options.auth.relations[key] to join table controllers when defined for individual access
