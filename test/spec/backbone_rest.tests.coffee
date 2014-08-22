@@ -90,7 +90,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested keys by single key respecting whitelist (key included)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'name', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'name', 'created_at']}})
 
         request(app)
           .get(ROUTE)
@@ -104,7 +104,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested keys by single key respecting whitelist (key excluded)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'created_at', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
           .get(ROUTE)
@@ -132,7 +132,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (keys included)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'name', 'created_at', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'name', 'created_at', 'updated_at']}})
 
         request(app)
           .get(ROUTE)
@@ -146,7 +146,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (key excluded)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'created_at', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'created_at', 'updated_at']}})
 
         request(app)
           .get(ROUTE)
@@ -160,7 +160,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested keys by an array of keys respecting whitelist (keys excluded)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'updated_at']}})
 
         request(app)
           .get(ROUTE)
@@ -216,7 +216,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested values by single key respecting whitelist (key included)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'name']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'name']}})
 
         request(app)
           .get(ROUTE)
@@ -230,7 +230,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested values by single key respecting whitelist (key excluded)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'created_at']}})
 
         request(app)
           .get(ROUTE)
@@ -258,7 +258,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (keys included)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'name', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'name', 'created_at']}})
 
         request(app)
           .get(ROUTE)
@@ -272,7 +272,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (key excluded)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'name']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'name']}})
 
         request(app)
           .get(ROUTE)
@@ -286,7 +286,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should select requested values by an array of keys respecting whitelist (keys excluded)', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {index: ['id', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {index: ['id', 'updated_at']}})
 
         request(app)
           .get(ROUTE)
@@ -341,7 +341,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should find an existing model with whitelist', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {show: ['id', 'name', 'created_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {show: ['id', 'name', 'created_at']}})
 
         attributes = _.clone(MODELS_JSON[0])
         request(app)
@@ -398,7 +398,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should create a new model and assign an id with whitelist', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {create: ['id', 'name', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {create: ['id', 'name', 'updated_at']}})
 
         attributes = {name: _.uniqueId('name_'), created_at: (new Date).toISOString(), updated_at: (new Date).toISOString()}
         request(app)
@@ -459,7 +459,7 @@ _.each BackboneORM.TestUtils.optionSets(), exports = (options) ->
 
       it 'should update an existing model with whitelist', (done) ->
         app = APP_FACTORY()
-        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelists: {update: ['id', 'name', 'updated_at']}})
+        controller = new RestController(app, {model_type: Flat, route: ROUTE, whitelist: {update: ['id', 'name', 'updated_at']}})
 
         attributes = _.clone(MODELS_JSON[1])
         attributes.name = "#{attributes.name}_#{_.uniqueId('name')}"

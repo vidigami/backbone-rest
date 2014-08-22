@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of BackboneREST.
 
+### 0.7.2
+* Bug fix whitelist (had left references as whitelists)
+
 ### 0.7.1
 * Bug fix for quoted template names
 

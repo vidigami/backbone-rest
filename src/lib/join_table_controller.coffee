@@ -6,7 +6,7 @@ module.exports = class JoinTableController extends RestController
 
   create: (req, res) ->
     try
-      json = JSONUtils.parseDates(if @whitelists.create then _.pick(req.body, @whitelists.create) else req.body)
+      json = JSONUtils.parseDates(if @whitelist.create then _.pick(req.body, @whitelist.create) else req.body)
 
       @model_type.exists json, (err, exists) =>
         return @sendError(res, err) if err
@@ -21,7 +21,7 @@ module.exports = class JoinTableController extends RestController
           return @sendError(res, err) if err
 
           event_data.model = model
-          json = if @whitelists.create then _.pick(model.toJSON(), @whitelists.create) else model.toJSON()
+          json = if @whitelist.create then _.pick(model.toJSON(), @whitelist.create) else model.toJSON()
           @render req, json, (err, json) =>
             return @sendError(res, err) if err
             @constructor.trigger('post:create', _.extend(event_data, {json: json}))
