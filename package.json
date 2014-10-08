@@ -43,7 +43,7 @@
     "mocha": "*",
     "powerset": "0.0.x",
     "restify": "2.x",
-    "supertest": "*"
+    "supertest": "0.13.x"
   },
   "dependencies": {
     "underscore": "1.7.x",
