@@ -123,11 +123,11 @@ module.exports = class RESTController extends (require './lib/json_controller')
     event_data = {req: req, res: res}
     @constructor.trigger('pre:destroy', event_data)
 
-    @model_type.exists @requestId(req), (err, exists) =>
+    @model_type.exists id = @requestId(req), (err, exists) =>
       return @sendError(res, err) if err
       return @sendStatus(res, 404) unless exists
 
-      @model_type.destroy {id: @requestId(req)}, (err) =>
+      @model_type.destroy id, (err) =>
         return @sendError(res, err) if err
         @constructor.trigger('post:destroy', event_data)
         res.json({})
